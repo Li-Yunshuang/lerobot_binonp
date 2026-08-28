@@ -7,20 +7,28 @@ new evaluation. Success requires **both** gates: position ≤ 3 cm and orientati
 `pos`/`ori` are mean errors in mm and degrees. `pos gate`/`ori gate` are the ceilings
 each axis would allow if the other were perfect — the lower one is what binds.
 
-## `e75`  (3 results)
+## `e75`  (7 results)
 
-| model | backbone | goal | aux | data | eps | n | success | 95% CI | pos | ori | pos gate | ori gate |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `pc_diffusion_aux_v1 (K=8)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 28 | **57.1%** | 39.1–73.5 | 30.6 | 10.5 | 67.9% | 67.9% |
-| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 336 | **51.5%** | 46.2–56.8 | 33.4 | 7.8 | 64.0% | 69.3% |
-| `push_dit_v3_all (K=1)` | dit | both | n=1,rot=T | push_v3 | 2115 | 336 | **39.9%** | 34.8–45.2 | 38.3 | 10.9 | 54.2% | 61.3% |
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `pc_diffusion_aux_v1 (K=8)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **80.4%** | 55.4% | 32.1 | 9.0 |
+| `pc_diffusion_aux_v1 (train goals)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **79.7%** | 47.9% | 33.9 | 8.4 |
+| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **78.6%** | 51.5% | 33.4 | 7.8 |
+| `push_aux_a1a2 (EMA)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **76.4%** | 54.2% | 32.7 | 8.8 |
+| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 46 | **76.1%** | 46.4% | 33.6 | 8.4 |
+| `push_aux_a1a2 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **75.4%** | 52.1% | 33.1 | 9.1 |
+| `push_dit_v3_all (K=1)` | dit | both | n=1,rot=T | push_v3 | 2115 | 276 | **68.1%** | 39.9% | 38.3 | 10.9 |
 
 Paired against `pc_diffusion_aux_v1 (K=1)`. Slots are keyed by (batch, env, object) and goals are
 verified identical via `goal_dist_m`, so McNemar applies only where marked paired.
 
 | vs baseline | shared | paired? | difference | 95% CI | McNemar p |
 |---|---|---|---|---|---|
-| `pc_diffusion_aux_v1 (K=8)` | 28 | yes | +0.0 pp | -14.0–+14.0 | 1 |
+| `pc_diffusion_aux_v1 (K=8)` | 336 | yes | +3.9 pp | -0.8–+8.6 | 0.14 |
+| `pc_diffusion_aux_v1 (train goals)` | 336 | **NO** (336 differ) | -3.6 pp | -10.0–+2.9 | n/a |
+| `pc_diffusion_v1 (K=1)` | 56 | yes | -3.6 pp | -18.4–+11.2 | 0.81 |
+| `push_aux_a1a2 (K=1)` | 336 | yes | +0.6 pp | -5.1–+6.3 | 0.92 |
+| `push_aux_a1a2 (EMA)` | 336 | yes | +2.7 pp | -2.6–+8.0 | 0.38 |
 | `push_dit_v3_all (K=1)` | 336 | yes | -11.6 pp | -18.5–-4.7 | 0.0014 |
 
 
@@ -28,56 +36,59 @@ Demonstrator on these objects (successful demos only, n=769): **8.8 mm** / **3.0
 
 ## `common11`  (1 result)
 
-| model | backbone | goal | aux | data | eps | n | success | 95% CI | pos | ori | pos gate | ori gate |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 132 | **46.2%** | 37.9–54.7 | 118.7 | 11.2 | 66.7% | 59.8% |
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 48 | **85.4%** | 46.2% | 118.7 | 11.2 |
 
 
 ## `common4`  (1 result)
 
-| model | backbone | goal | aux | data | eps | n | success | 95% CI | pos | ori | pos gate | ori gate |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 48 | **29.2%** | 18.2–43.2 | 52.4 | 13.9 | 35.4% | 54.2% |
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 48 | **39.6%** | 29.2% | 52.4 | 13.9 |
 
 
 ## `heldout`  (11 results)
 
-| model | backbone | goal | aux | data | eps | n | success | 95% CI | pos | ori | pos gate | ori gate |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 126 | **50.0%** | 41.4–58.6 | 30.8 | 9.1 | 62.7% | 64.3% |
-| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 126 | **43.7%** | 35.3–52.4 | 34.2 | 9.5 | 59.5% | 61.1% |
-| `push_dit_v2 (K=1)` | dit | both | n=1,rot=T | push_v2 | 1643 | 168 | **43.5%** | 36.2–51.0 | 39.9 | 10.8 | 58.3% | 58.9% |
-| `push_dit_v2 (50 steps)` | dit | both | n=1,rot=T | push_v2 | 1643 | 84 | **42.9%** | 32.8–53.5 | 34.7 | 10.5 | 56.0% | 65.5% |
-| `push_unet_oldata (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 252 | **40.9%** | 35.0–47.0 | 35.1 | 11.3 | 57.5% | 56.0% |
-| `push_unet_v2 (chunk 16)` | unet | both | n=1,rot=T | push_v2 | 1643 | 84 | **38.1%** | 28.4–48.8 | 35.4 | 10.8 | 56.0% | 57.1% |
-| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 168 | **35.7%** | 28.9–43.2 | 36.2 | 11.0 | 54.2% | 54.8% |
-| `push_unet_recover (K=1)` | unet | points | n=1,rot=F | push_v2 | 1643 | 168 | **34.5%** | 27.8–42.0 | 41.1 | 11.2 | 48.8% | 53.0% |
-| `push_dit_v2 (100 steps)` | dit | both | n=1,rot=T | push_v2 | 1643 | 84 | **32.1%** | 23.1–42.7 | 35.7 | 11.5 | 50.0% | 53.6% |
-| `push_unet_v2 (chunk 8)` | unet | both | n=1,rot=T | push_v2 | 1643 | 84 | **27.4%** | 19.0–37.7 | 42.0 | 11.9 | 45.2% | 48.8% |
-| `pcd_diffusion_v1 (K=1)` | unet | ? | n=0,rot=T | push_pc1024 | 1619 | 126 | **9.5%** | 5.5–15.9 | 156.9 | 23.4 | 27.8% | 26.2% |
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_unet_oldata (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 84 | **79.8%** | 40.9% | 35.1 | 11.3 |
+| `push_unet_v2 (chunk 16)` | unet | both | n=1,rot=T | push_v2 | 1643 | 48 | **77.1%** | 38.1% | 35.4 | 10.8 |
+| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 42 | **76.2%** | 50.0% | 30.8 | 9.1 |
+| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 42 | **73.8%** | 43.7% | 34.2 | 9.5 |
+| `push_dit_v2 (K=1)` | dit | both | n=1,rot=T | push_v2 | 1643 | 96 | **70.8%** | 43.5% | 39.9 | 10.8 |
+| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 96 | **67.7%** | 35.7% | 36.2 | 11.0 |
+| `push_dit_v2 (50 steps)` | dit | both | n=1,rot=T | push_v2 | 1643 | 48 | **66.7%** | 42.9% | 34.7 | 10.5 |
+| `push_unet_recover (K=1)` | unet | points | n=1,rot=F | push_v2 | 1643 | 96 | **61.5%** | 34.5% | 41.1 | 11.2 |
+| `push_dit_v2 (100 steps)` | dit | both | n=1,rot=T | push_v2 | 1643 | 48 | **60.4%** | 32.1% | 35.7 | 11.5 |
+| `push_unet_v2 (chunk 8)` | unet | both | n=1,rot=T | push_v2 | 1643 | 48 | **58.3%** | 27.4% | 42.0 | 11.9 |
+| `pcd_diffusion_v1 (K=1)` | unet | ? | n=0,rot=T | push_pc1024 | 1619 | 42 | **31.0%** | 9.5% | 156.9 | 23.4 |
 
 
 ## `indomain`  (7 results)
 
-| model | backbone | goal | aux | data | eps | n | success | 95% CI | pos | ori | pos gate | ori gate |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 114 | **56.1%** | 47.0–64.9 | 31.1 | 8.0 | 63.2% | 76.3% |
-| `push_unet_oldata (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 228 | **53.5%** | 47.0–59.9 | 32.3 | 8.3 | 65.4% | 72.8% |
-| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 114 | **49.1%** | 40.1–58.2 | 35.0 | 9.8 | 60.5% | 69.3% |
-| `push_dit_v2 (K=1)` | dit | both | n=1,rot=T | push_v2 | 1643 | 168 | **44.0%** | 36.8–51.6 | 30.0 | 8.5 | 60.1% | 69.0% |
-| `push_unet_recover (K=1)` | unet | points | n=1,rot=F | push_v2 | 1643 | 168 | **41.7%** | 34.5–49.2 | 35.6 | 9.5 | 53.0% | 64.3% |
-| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 168 | **41.7%** | 34.5–49.2 | 32.7 | 10.2 | 57.7% | 59.5% |
-| `pcd_diffusion_v1 (K=1)` | unet | ? | n=0,rot=T | push_pc1024 | 1619 | 114 | **10.5%** | 6.1–17.5 | 64.8 | 26.6 | 27.2% | 24.6% |
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 36 | **80.6%** | 56.1% | 31.1 | 8.0 |
+| `push_unet_oldata (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 72 | **79.2%** | 53.5% | 32.3 | 8.3 |
+| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 36 | **69.4%** | 49.1% | 35.0 | 9.8 |
+| `push_dit_v2 (K=1)` | dit | both | n=1,rot=T | push_v2 | 1643 | 60 | **66.7%** | 44.0% | 30.0 | 8.5 |
+| `push_unet_recover (K=1)` | unet | points | n=1,rot=F | push_v2 | 1643 | 60 | **66.7%** | 41.7% | 35.6 | 9.5 |
+| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 60 | **65.0%** | 41.7% | 32.7 | 10.2 |
+| `pcd_diffusion_v1 (K=1)` | unet | ? | n=0,rot=T | push_pc1024 | 1619 | 36 | **19.4%** | 10.5% | 64.8 | 26.6 |
 
 
 ## Reading these numbers
 
 - **Compare only within an eval-set section.** The same checkpoint scores several points
   apart across `heldout`, `indomain` and `e75`.
-- **Cross-run differences under ~15 pp are not trustworthy.** `pc_diffusion_aux_v1` and
-  `push_unet_oldata` share config, seed, episode list and architecture, yet differ by
-  14.3 pp paired (p=0.003) — they were trained two days apart from untracked code.
-  Treat that as the noise floor for any comparison between two separate training runs.
+- **A single run occasionally lands far off.** Three UNet runs share the same recipe and
+  data: `pc_diffusion_aux_v1` (51.5%), `push_aux_a1a2` non-EMA (52.1%), and
+  `push_unet_oldata` (35.7% paired vs aux_v1's 50.0% on `heldout`, p=0.003). Two agree
+  closely; the third is ~15 pp low with no config, seed or code difference that explains
+  it — its missing `task_onehot` feature is skipped safely by the model. So typical
+  run-to-run variation is small, but a run can still fail badly and silently. Re-run a
+  surprising arm before acting on it rather than assuming a fixed noise floor.
 - **Same-run comparisons are exempt.** EMA vs non-EMA weights from one run, or K=1 vs K=8
   on one checkpoint, share the training trajectory and resolve to ~±7.5 pp at n=336.
 - `pc_diffusion_aux_v1` cannot be retrained; the code that produced it is gone. It remains

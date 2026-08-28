@@ -80,6 +80,16 @@ class PCDiffusionConfig(PreTrainedConfig):
     pc_center: tuple[float, float, float] = (0.0, 0.0, 0.2)
     pc_scale: float = 0.7
 
+    # --- joint observation/goal encoding ---
+    # Replaces the two independent encoders with one that lets the clouds cross-attend before
+    # pooling. Contributes `2 * pc_feature_dim`, i.e. exactly what the pair contributed, so
+    # global_cond_dim and the U-Net parameter count are unchanged. Requires goal_conditioning to
+    # include points -- there is no goal cloud to attend to otherwise.
+    pc_cross_attention: bool = False
+    cross_attn_hidden_dim: int = 256
+    cross_attn_num_heads: int = 4
+    cross_attn_num_layers: int = 2
+
     # --- goal conditioning ---
     goal_conditioning: str = "points"
     goal_pc_feature_key: str = OBS_GOAL_POINT_CLOUD

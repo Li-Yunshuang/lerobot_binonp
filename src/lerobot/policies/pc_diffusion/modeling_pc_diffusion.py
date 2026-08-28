@@ -59,6 +59,7 @@ from lerobot.utils.import_utils import require_package
 
 from .configuration_pc_diffusion import PCDiffusionConfig
 from .encoders import make_pc_encoder
+from .encoders.cross_attention import CrossAttentionPointEncoder
 
 
 class PCDiffusionPolicy(PreTrainedPolicy):
@@ -170,6 +171,34 @@ class PCDiffusionModel(nn.Module):
 
         pc_ft = config.observation_pc_feature
         num_points, in_channels = int(pc_ft.shape[0]), int(pc_ft.shape[1])
+
+        # Joint path: one module consumes both clouds and contributes what the two separate
+        # encoders did, leaving global_cond_dim untouched.
+        self.cross_encoder = None
+        if config.pc_cross_attention:
+            if config.goal_conditioning not in ("points", "both"):
+                raise ValueError(
+                    "pc_cross_attention=True requires goal_conditioning to include points "
+                    f"(got {config.goal_conditioning!r}); there is no goal cloud to attend to."
+                )
+            self.cross_encoder = CrossAttentionPointEncoder(
+                in_channels=in_channels,
+                out_dim=config.pc_feature_dim,
+                hidden_dim=config.cross_attn_hidden_dim,
+                num_heads=config.cross_attn_num_heads,
+                num_layers=config.cross_attn_num_layers,
+            )
+            self.pc_encoder = None
+            self.goal_encoder = None
+            global_cond_dim += self.cross_encoder.feature_dim
+            if config.goal_conditioning in ("vector", "both"):
+                global_cond_dim += config.input_features[config.goal_feature_key].shape[0]
+            if config.use_task_onehot and config.task_feature_key in config.input_features:
+                global_cond_dim += config.input_features[config.task_feature_key].shape[0]
+            self.global_cond_dim = global_cond_dim
+            self._finish_init(config, global_cond_dim)
+            return
+
         self.pc_encoder = make_pc_encoder(
             config.pc_encoder,
             num_points=num_points,
@@ -196,7 +225,10 @@ class PCDiffusionModel(nn.Module):
             global_cond_dim += config.input_features[config.task_feature_key].shape[0]
 
         self.global_cond_dim = global_cond_dim
+        self._finish_init(config, global_cond_dim)
 
+    def _finish_init(self, config: PCDiffusionConfig, global_cond_dim: int) -> None:
+        """Everything downstream of the encoders, shared by the separate and joint paths."""
         # Buffers so isotropic rescaling travels with the checkpoint.
         self.register_buffer("_pc_center", torch.tensor(config.pc_center, dtype=torch.float32))
 
@@ -239,11 +271,17 @@ class PCDiffusionModel(nn.Module):
 
     # ---- conditioning ------------------------------------------------------------------
 
+    def _rescale(self, cloud: Tensor) -> Tensor:
+        """Optional shared isotropic rescale, applied identically to every cloud."""
+        if not self.config.pc_isotropic_rescale:
+            return cloud
+        cloud = cloud.clone()
+        cloud[..., :3] = (cloud[..., :3] - self._pc_center) / self.config.pc_scale
+        return cloud
+
     def _encode_cloud(self, encoder, cloud: Tensor, batch_size: int, n_obs_steps: int) -> Tensor:
         """Encode a `(B, S, N, C)` cloud stack to `(B, S, D)`."""
-        if self.config.pc_isotropic_rescale:
-            cloud = cloud.clone()
-            cloud[..., :3] = (cloud[..., :3] - self._pc_center) / self.config.pc_scale
+        cloud = self._rescale(cloud)
         feats = encoder(einops.rearrange(cloud, "b s n c -> (b s) n c"))
         return einops.rearrange(feats, "(b s) d -> b s d", b=batch_size, s=n_obs_steps)
 
@@ -257,12 +295,26 @@ class PCDiffusionModel(nn.Module):
         feats = [batch[OBS_STATE]]
         feats.extend(batch[key] for key in self.config.extra_state_keys)
 
-        feats.append(self._encode_cloud(self.pc_encoder, batch[self.config.pc_feature_key], b, s))
-
-        if self.config.goal_conditioning in ("points", "both"):
-            feats.append(
-                self._encode_cloud(self.goal_encoder, batch[self.config.goal_pc_feature_key], b, s)
+        if self.cross_encoder is not None:
+            # Both clouds enter one module, so they are rescaled and flattened together and the
+            # attention sees them in the same frame.
+            obs = self._rescale(batch[self.config.pc_feature_key])
+            goal = self._rescale(batch[self.config.goal_pc_feature_key])
+            joint = self.cross_encoder(
+                einops.rearrange(obs, "b s n c -> (b s) n c"),
+                einops.rearrange(goal, "b s n c -> (b s) n c"),
             )
+            feats.append(einops.rearrange(joint, "(b s) d -> b s d", b=b, s=s))
+        else:
+            feats.append(
+                self._encode_cloud(self.pc_encoder, batch[self.config.pc_feature_key], b, s)
+            )
+            if self.config.goal_conditioning in ("points", "both"):
+                feats.append(
+                    self._encode_cloud(
+                        self.goal_encoder, batch[self.config.goal_pc_feature_key], b, s
+                    )
+                )
         if self.config.goal_conditioning in ("vector", "both"):
             feats.append(self._broadcast(batch[self.config.goal_feature_key], b, s))
         if self.config.use_task_onehot and self.config.task_feature_key in batch:
