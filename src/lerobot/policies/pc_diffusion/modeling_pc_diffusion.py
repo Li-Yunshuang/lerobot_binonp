@@ -235,6 +235,17 @@ class PCDiffusionModel(nn.Module):
         # Auxiliary head: reads the same flat conditioning vector the U-Net does, so whatever it
         # needs to solve the residual-pose task must be present in the encoder's output. Training
         # only -- `conditional_sample` never touches it, so inference cost is unchanged.
+        # Future-latent predictor: conditioning vector -> predicted observation latent.
+        # Asymmetric by design (online side only); see the config for why that matters.
+        self.future_predictor = None
+        if config.uses_future_latent:
+            dims = [global_cond_dim * config.n_obs_steps, *config.future_latent_predictor_dims]
+            layers: list[nn.Module] = []
+            for a, b in zip(dims[:-1], dims[1:], strict=True):
+                layers += [nn.Linear(a, b), nn.LayerNorm(b), nn.ReLU(inplace=True)]
+            layers.append(nn.Linear(dims[-1], config.pc_feature_dim))
+            self.future_predictor = nn.Sequential(*layers)
+
         self.aux_head = None
         if config.uses_aux_head:
             self.aux_head = ResidualPoseHead(
@@ -270,6 +281,42 @@ class PCDiffusionModel(nn.Module):
         )
 
     # ---- conditioning ------------------------------------------------------------------
+
+    def _split_future(self, batch: dict[str, Tensor]) -> tuple[dict[str, Tensor], Tensor | None]:
+        """Peel the future-latent target frame off the observation window.
+
+        With `uses_future_latent`, `observation_delta_indices` appends one frame at
+        `future_latent_horizon`, so every observation key arrives with `n_obs_steps + 1` steps.
+        That frame must never reach the conditioning path -- a policy conditioned on its own
+        future is measuring nothing. Rather than trusting call sites to slice, this strips the
+        extra step from *every* key that carries it and hands the target back separately.
+        """
+        if not self.config.uses_future_latent:
+            return batch, None
+        s = self.config.n_obs_steps
+        future = None
+        out = {}
+        for k, v in batch.items():
+            if torch.is_tensor(v) and v.ndim >= 2 and v.shape[1] == s + 1:
+                if k == self.config.pc_feature_key:
+                    future = v[:, -1]
+                out[k] = v[:, :s]
+            else:
+                out[k] = v
+        return out, future
+
+    def _encode_obs_latent(self, obs_cloud: Tensor, goal_cloud: Tensor) -> Tensor:
+        """Observation latent for one `(B, N, C)` cloud, via whichever encoder is configured.
+
+        Must be the *same* function that produces the observation half of the conditioning
+        vector, or the auxiliary task is regressing onto a different representation than the
+        one it is meant to shape.
+        """
+        obs = self._rescale(obs_cloud)
+        if self.cross_encoder is not None:
+            joint = self.cross_encoder(obs, self._rescale(goal_cloud))
+            return joint[:, : self.config.pc_feature_dim]
+        return self.pc_encoder(obs)
 
     def _rescale(self, cloud: Tensor) -> Tensor:
         """Optional shared isotropic rescale, applied identically to every cloud."""
@@ -424,6 +471,7 @@ class PCDiffusionModel(nn.Module):
     # ---- training ----------------------------------------------------------------------
 
     def compute_loss(self, batch: dict[str, Tensor]) -> tuple[Tensor, dict[str, float]]:
+        batch, future_cloud = self._split_future(batch)
         missing = {OBS_STATE, ACTION, self.config.pc_feature_key} - set(batch)
         if missing:
             raise ValueError(f"Batch is missing required keys: {sorted(missing)}")
@@ -508,5 +556,28 @@ class PCDiffusionModel(nn.Module):
                 aux_loss = per.mean()
             out["aux_residual_loss"] = aux_loss.item()
             total = total + cfg.aux_residual_weight * aux_loss
+
+        if self.future_predictor is not None:
+            if future_cloud is None:
+                raise ValueError(
+                    "future_latent_weight > 0 but the batch carries no future frame. The "
+                    "dataloader must be built from this config so observation_delta_indices "
+                    f"includes +{self.config.future_latent_horizon}."
+                )
+            goal_now = batch[self.config.goal_pc_feature_key][:, -1]
+            target = self._encode_obs_latent(future_cloud, goal_now)
+            if self.config.future_latent_stop_grad:
+                # Without this the cheapest way to cut the loss is to shrink the target, which
+                # collapses the shared encoder and takes the policy's features with it.
+                target = target.detach()
+            pred = self.future_predictor(global_cond)
+            # Negative cosine (SimSiam): scale-invariant, so the loss cannot be reduced by
+            # simply shrinking the representation.
+            fl = -F.cosine_similarity(pred, target, dim=-1).mean()
+            out["future_latent_loss"] = fl.item()
+            # Collapse diagnostic. This is the number to watch, not the loss: a collapsing
+            # encoder shows a falling std while the loss looks healthy.
+            out["future_latent_std"] = float(target.std(dim=0).mean())
+            total = total + self.config.future_latent_weight * fl
 
         return total, out

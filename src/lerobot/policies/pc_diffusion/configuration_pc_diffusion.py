@@ -227,9 +227,34 @@ class PCDiffusionConfig(PreTrainedConfig):
     def goal_pc_feature(self):
         return (self.input_features or {}).get(self.goal_pc_feature_key)
 
+    # --- future-latent auxiliary head ---
+    # Predicts the encoder's own latent for the observation `future_latent_horizon` frames
+    # ahead, i.e. a latent forward model. Unlike the residual-pose head -- whose target's
+    # variance collapsed 10x under the commanded-goal convention, leaving aux_residual_loss
+    # at 0.000 on every recent run -- this target carries real variance: the scene cloud's
+    # centroid moves a median 33 mm over 32 frames.
+    #
+    # The target is produced by the SAME encoder being trained, so the loss is minimised by a
+    # constant encoder output. That failure would not merely trivialise the auxiliary task --
+    # the encoder is shared with the policy conditioning, so a collapse destroys the policy's
+    # observation features. Two guards, both on by default:
+    #   * `future_latent_stop_grad` detaches the target, so no gradient rewards shrinking it.
+    #   * `future_latent_predictor_dims` puts an asymmetric predictor on the online side only
+    #     (SimSiam, Chen & He 2021), which prevents collapse without a momentum encoder.
+    # `future_latent_std` is logged every step; if it trends to zero, the representation is
+    # collapsing regardless of what the loss says.
+    future_latent_weight: float = 0.0
+    future_latent_horizon: int = 32
+    future_latent_stop_grad: bool = True
+    future_latent_predictor_dims: tuple[int, ...] = (512, 512)
+
     @property
     def uses_aux_head(self) -> bool:
         return self.num_objects > 0 and self.aux_residual_weight > 0
+
+    @property
+    def uses_future_latent(self) -> bool:
+        return self.future_latent_weight > 0 and self.future_latent_horizon > 0
 
     def validate_features(self) -> None:
         if self.observation_pc_feature is None:
@@ -295,7 +320,13 @@ class PCDiffusionConfig(PreTrainedConfig):
 
     @property
     def observation_delta_indices(self) -> list:
-        return list(range(1 - self.n_obs_steps, 1))
+        idx = list(range(1 - self.n_obs_steps, 1))
+        if self.uses_future_latent:
+            # One extra, non-contiguous frame: the future-latent target. A contiguous range
+            # would make the dataloader fetch `horizon` extra frames of every observation key
+            # -- 32 extra 1024-point clouds per sample -- to use exactly one of them.
+            idx.append(self.future_latent_horizon)
+        return idx
 
     @property
     def action_delta_indices(self) -> list:
