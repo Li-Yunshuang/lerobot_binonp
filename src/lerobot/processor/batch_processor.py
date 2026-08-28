@@ -26,7 +26,7 @@ from torch import Tensor
 
 from lerobot.configs import PipelineFeatureType, PolicyFeature
 from lerobot.lerobot_types import EnvTransition, PolicyAction
-from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE
+from lerobot.utils.constants import OBS_ENV_STATE, OBS_IMAGE, OBS_IMAGES, OBS_STATE, is_point_cloud_key
 
 from .pipeline import (
     ComplementaryDataProcessorStep,
@@ -116,6 +116,13 @@ class AddBatchDimensionObservationStep(ObservationProcessorStep):
         # Process multiple image observations - add batch dim if 3D
         for key, value in observation.items():
             if key.startswith(f"{OBS_IMAGES}.") and isinstance(value, Tensor) and value.dim() == 3:
+                observation[key] = value.unsqueeze(0)
+
+        # Process point clouds - add batch dim if 2D. A rank-2 tensor is a single unbatched
+        # (num_points, num_channels) cloud; rank-3 already carries a leading batch dimension
+        # (as produced by a vector env), so it is left alone.
+        for key, value in observation.items():
+            if is_point_cloud_key(key) and isinstance(value, Tensor) and value.dim() == 2:
                 observation[key] = value.unsqueeze(0)
         return observation
 

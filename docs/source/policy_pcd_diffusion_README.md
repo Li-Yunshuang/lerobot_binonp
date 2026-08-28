@@ -1,0 +1,1 @@
+../../../../src/lerobot/policies/pcd_diffusion/README.md

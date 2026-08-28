@@ -23,6 +23,21 @@ OBS_ENV_STATE = OBS_STR + ".environment_state"
 OBS_STATE = OBS_STR + ".state"
 OBS_IMAGE = OBS_STR + ".image"
 OBS_IMAGES = OBS_IMAGE + "s"
+OBS_POINT_CLOUD = OBS_STR + ".point_cloud"
+OBS_GOAL_POINT_CLOUD = OBS_STR + ".goal_point_cloud"
+
+
+def is_point_cloud_key(key: str) -> bool:
+    """Whether an observation key holds a rank-2 ``(num_points, num_channels)`` point cloud.
+
+    Matches ``observation.point_cloud`` and ``observation.goal_point_cloud``, plus any dotted
+    extension of them (e.g. a per-camera ``observation.point_cloud.left``). Defined here, next to
+    the key constants, so both feature typing and the processor steps agree on one rule.
+    """
+    if not key.startswith(OBS_PREFIX):
+        return False
+    head = key[len(OBS_PREFIX) :].split(".", 1)[0]
+    return head == "point_cloud" or head.endswith("_point_cloud")
 OBS_LANGUAGE = OBS_STR + ".language"
 OBS_LANGUAGE_TOKENS = OBS_LANGUAGE + ".tokens"
 OBS_LANGUAGE_ATTENTION_MASK = OBS_LANGUAGE + ".attention_mask"

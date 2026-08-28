@@ -20,6 +20,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import datasets
+import numpy as np
+import pyarrow as pa
 import torch
 
 from lerobot.configs import (
@@ -286,11 +288,103 @@ class DatasetReader:
                 if self._absolute_to_relative_idx is None
                 else [self._absolute_to_relative_idx[idx] for idx in q_idx]
             )
+            fast = self._take_numeric_column(key, relative_indices)
+            if fast is not None:
+                result[key] = fast
+                continue
             try:
                 result[key] = torch.stack(self.hf_dataset[key][relative_indices])
             except (KeyError, TypeError, IndexError):
                 result[key] = torch.stack(self.hf_dataset[relative_indices][key])
         return result
+
+    def _column_chunk_offsets(self, key: str) -> "np.ndarray":
+        """Cumulative row offsets of each Arrow chunk of ``key`` (length num_chunks + 1)."""
+        cache = self.__dict__.setdefault("_chunk_offsets_cache", {})
+        if key not in cache:
+            chunks = self.hf_dataset.data.column(key).chunks
+            offsets = np.zeros(len(chunks) + 1, dtype=np.int64)
+            for i, chunk in enumerate(chunks):
+                offsets[i + 1] = offsets[i] + len(chunk)
+            cache[key] = offsets
+        return cache[key]
+
+    @staticmethod
+    def _decode_arrow_rows(arr, dtype: str) -> tuple["np.ndarray", bool]:
+        """Flatten an Arrow array of rows to a 1-D numpy buffer.
+
+        Returns ``(flat, peeled)``; ``peeled`` says whether any list layer was unwrapped, which
+        distinguishes a genuinely scalar column from a length-1 list one.
+        """
+        if isinstance(arr.type, pa.ExtensionType):
+            arr = arr.storage
+        peeled = False
+        while (
+            pa.types.is_list(arr.type)
+            or pa.types.is_fixed_size_list(arr.type)
+            or pa.types.is_large_list(arr.type)
+        ):
+            arr = arr.flatten()
+            peeled = True
+        return arr.to_numpy(zero_copy_only=False), peeled
+
+    def _take_numeric_column(self, key: str, indices: list[int]) -> torch.Tensor | None:
+        """Gather rows of a single numeric column straight from Arrow.
+
+        The generic HF path (``hf_dataset[key][indices]``) formats *every* column of every
+        requested row and runs ``torch.tensor`` per value. For a long action window on a dataset
+        that also carries large point-cloud columns that is pathological: measured at 167 ms to
+        fetch a 64-step ``action`` window, versus 0.04 ms here, bit-identical.
+
+        Rows are taken from the individual Arrow chunk that owns them. Calling ``take`` on the
+        whole ChunkedArray instead would combine every chunk first, materialising the entire
+        column -- ~8 GB for a 647k-frame point-cloud column, per dataloader worker.
+
+        Returns ``None`` whenever the fast path does not apply so the caller falls back.
+        """
+        # An HF indices mapping (from .select()/.shuffle()) would make row i of the underlying
+        # table a different row than hf_dataset[i]. Bail out rather than silently mis-index.
+        if getattr(self.hf_dataset, "_indices", None) is not None:
+            return None
+
+        ft = self._meta.features.get(key)
+        if ft is None or ft.get("dtype") in (None, "string", "language", "image", "video"):
+            return None
+
+        n = len(indices)
+        shape = tuple(ft["shape"])
+        try:
+            column = self.hf_dataset.data.column(key)
+            offsets = self._column_chunk_offsets(key)
+            idx = np.asarray(indices, dtype=np.int64)
+            if idx.min() < 0 or idx.max() >= offsets[-1]:
+                return None
+            chunk_ids = np.searchsorted(offsets, idx, side="right") - 1
+
+            out: np.ndarray | None = None
+            peeled_any = False
+            for cid in np.unique(chunk_ids):
+                sel = np.nonzero(chunk_ids == cid)[0]
+                local = pa.array(idx[sel] - offsets[cid], type=pa.int64())
+                flat, peeled = self._decode_arrow_rows(column.chunk(int(cid)).take(local), ft["dtype"])
+                peeled_any = peeled_any or peeled
+                per_row = flat.size // len(sel)
+                if out is None:
+                    out = np.empty((n, per_row), dtype=flat.dtype)
+                elif out.shape[1] != per_row:
+                    return None  # ragged across chunks
+                out[sel] = flat.reshape(len(sel), per_row)
+        except Exception:
+            return None
+
+        if out is None:
+            return None
+        target: tuple[int, ...] = shape if peeled_any else ()
+        if out.size != n * int(np.prod(target)):  # np.prod(()) == 1, covering the scalar case
+            return None
+        # np.array (not ascontiguousarray) so the result owns writable memory, matching the
+        # freshly-built tensors the generic path returns.
+        return torch.from_numpy(np.array(out.reshape(n, *target), dtype=ft["dtype"], copy=True))
 
     def _query_videos(self, query_timestamps: dict[str, list[float]], ep_idx: int) -> dict[str, torch.Tensor]:
         """Note: When using data workers (e.g. DataLoader with num_workers>0), do not call this function

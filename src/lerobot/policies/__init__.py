@@ -27,6 +27,8 @@ from .molmoact2.configuration_molmoact2 import MolmoAct2Config as MolmoAct2Confi
 from .multi_task_dit.configuration_multi_task_dit import MultiTaskDiTConfig as MultiTaskDiTConfig
 from .pi0.configuration_pi0 import PI0Config as PI0Config
 from .pi0_fast.configuration_pi0_fast import PI0FastConfig as PI0FastConfig
+from .pc_diffusion.configuration_pc_diffusion import PCDiffusionConfig as PCDiffusionConfig
+from .pcd_diffusion.configuration_pcd_diffusion import PcdDiffusionConfig as PcdDiffusionConfig
 from .pi05.configuration_pi05 import PI05Config as PI05Config
 from .pretrained import PreTrainedPolicy as PreTrainedPolicy
 from .smolvla.configuration_smolvla import SmolVLAConfig as SmolVLAConfig
@@ -53,6 +55,8 @@ __all__ = [
     "LingBotVAConfig",
     "MolmoAct2Config",
     "MultiTaskDiTConfig",
+    "PCDiffusionConfig",
+    "PcdDiffusionConfig",
     "PI0Config",
     "PI0FastConfig",
     "PI05Config",

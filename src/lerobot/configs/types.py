@@ -24,6 +24,9 @@ class FeatureType(str, Enum):
     ACTION = "ACTION"
     REWARD = "REWARD"
     LANGUAGE = "LANGUAGE"
+    # Rank-2 (num_points, num_channels) point clouds. Kept distinct from STATE so a policy can
+    # give them their own NormalizationMode instead of inheriting proprioception's.
+    POINT_CLOUD = "POINT_CLOUD"
 
 
 class PipelineFeatureType(str, Enum):

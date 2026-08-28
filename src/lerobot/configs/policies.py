@@ -154,6 +154,13 @@ class PreTrainedConfig(draccus.ChoiceRegistry, HubMixin, abc.ABC):  # type: igno
         return {key: ft for key, ft in self.input_features.items() if ft.type is FeatureType.VISUAL}
 
     @property
+    def point_cloud_features(self) -> dict[str, PolicyFeature]:
+        """Rank-2 ``(num_points, num_channels)`` point-cloud inputs, keyed by feature name."""
+        if not self.input_features:
+            return {}
+        return {key: ft for key, ft in self.input_features.items() if ft.type is FeatureType.POINT_CLOUD}
+
+    @property
     def action_feature(self) -> PolicyFeature | None:
         if not self.output_features:
             return None
