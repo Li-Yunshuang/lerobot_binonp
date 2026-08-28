@@ -88,7 +88,7 @@ def test_future_frame_never_reaches_the_conditioning():
 
     stripped, future = model._split_future(batch)
     assert future is not None
-    assert future.shape == (2, 64, 3)
+    assert future["observation.point_cloud"].shape == (2, 64, 3)
     for key in ("observation.state", "observation.point_cloud", "observation.goal_point_cloud"):
         assert stripped[key].shape[1] == 2, f"{key} still carries the future frame"
 
@@ -108,7 +108,7 @@ def test_stop_gradient_on_target():
     _, future = model._split_future(batch)
     goal = batch["observation.goal_point_cloud"][:, 1]
 
-    tgt = model._encode_obs_latent(future, goal)
+    tgt = model._encode_obs_latent(future["observation.point_cloud"], goal)
     assert tgt.requires_grad, "sanity: the raw target should be differentiable before detach"
 
     loss, out = model.compute_loss(batch)
@@ -155,3 +155,43 @@ def test_disabled_by_default_leaves_the_batch_alone():
     assert future is None and stripped is batch
     _, out = model.compute_loss(batch)
     assert "future_latent_loss" not in out
+
+
+def _pose_batch(b: int = 2, steps: int = 3) -> dict[str, torch.Tensor]:
+    batch = _batch(b, steps)
+    eye = torch.eye(4).expand(b, steps, 1, 4, 4).clone()
+    batch["observation.object_poses"] = eye.clone()
+    goal = eye.clone()
+    goal[..., :3, 3] = torch.tensor([0.1, 0.0, 0.0])  # object still 10 cm from its goal
+    batch["observation.goal_object_poses"] = goal
+    return batch
+
+
+def test_object_crop_keeps_cloud_length_and_drops_far_points():
+    """Cropping must not change the encoder's input length -- max-pool is duplication-invariant."""
+    model = PCDiffusionModel(_config(future_latent_object_only=True))
+    batch = _pose_batch()
+    _, fut = model._split_future(batch)
+    cloud = fut["observation.point_cloud"]
+    goal = fut["observation.goal_point_cloud"]
+    cropped = model._object_crop(cloud, goal, fut)
+    assert cropped.shape == cloud.shape, "cropping changed the cloud length"
+    # Every kept point must be one of the originals, and closer to the derived centre than the
+    # points that were dropped.
+    centre = goal.mean(dim=1) - torch.tensor([0.1, 0.0, 0.0])
+    d_kept = (cropped - centre[:, None, :]).norm(dim=-1).max(dim=1).values
+    d_all = (cloud - centre[:, None, :]).norm(dim=-1).max(dim=1).values
+    assert (d_kept <= d_all + 1e-6).all()
+
+
+def test_object_crop_requires_pose_keys():
+    model = PCDiffusionModel(_config(future_latent_object_only=True))
+    with pytest.raises(ValueError, match="object_poses"):
+        model.compute_loss(_batch())
+
+
+def test_object_crop_trains_end_to_end():
+    model = PCDiffusionModel(_config(future_latent_object_only=True))
+    loss, out = model.compute_loss(_pose_batch())
+    assert loss.isfinite() and "future_latent_loss" in out
+    loss.backward()

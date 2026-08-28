@@ -294,16 +294,46 @@ class PCDiffusionModel(nn.Module):
         if not self.config.uses_future_latent:
             return batch, None
         s = self.config.n_obs_steps
-        future = None
+        future: dict[str, Tensor] = {}
         out = {}
         for k, v in batch.items():
             if torch.is_tensor(v) and v.ndim >= 2 and v.shape[1] == s + 1:
-                if k == self.config.pc_feature_key:
-                    future = v[:, -1]
+                future[k] = v[:, -1]
                 out[k] = v[:, :s]
             else:
                 out[k] = v
-        return out, future
+        return out, (future or None)
+
+    def _object_crop(self, cloud: Tensor, goal_cloud: Tensor, fut: dict[str, Tensor]) -> Tensor:
+        """Keep the K points nearest the object, dropping most of the arms.
+
+        The dataset has no per-point labels, so the object centroid is derived from what is
+        stored: the goal cloud is the object's geometry at the goal, and (goal_pose -
+        object_pose) is the displacement still to come, so subtracting it from the goal cloud's
+        centroid gives the object's centroid now. Measured on push_pc1024_poses, the K nearest
+        points to that centroid span 86-88% of the object's true extent.
+
+        The kept points are tiled back to the cloud's original length. A max-pool is invariant
+        to duplicated points, so this changes the encoder's input length not at all while
+        changing its content to object-only.
+        """
+        cfg = self.config
+        obj = fut.get(cfg.object_poses_key)
+        goal = fut.get(cfg.goal_object_poses_key)
+        if obj is None or goal is None:
+            raise ValueError(
+                "future_latent_object_only=True needs "
+                f"('{cfg.object_poses_key}', '{cfg.goal_object_poses_key}') in the batch; "
+                "only the pose-augmented datasets carry them."
+            )
+        remaining = goal[..., :3, 3] - obj[..., :3, 3]  # (B, K, 3)
+        centre = goal_cloud.mean(dim=1) - remaining.reshape(remaining.shape[0], -1, 3)[:, 0]
+        d = (cloud - centre[:, None, :]).norm(dim=-1)  # (B, N)
+        k = min(cfg.future_latent_object_points, cloud.shape[1])
+        idx = d.topk(k, dim=1, largest=False).indices
+        kept = cloud.gather(1, idx[..., None].expand(-1, -1, cloud.shape[-1]))
+        reps = -(-cloud.shape[1] // k)  # ceil, so the tiled cloud is at least the original length
+        return kept.repeat(1, reps, 1)[:, : cloud.shape[1]]
 
     def _encode_obs_latent(self, obs_cloud: Tensor, goal_cloud: Tensor) -> Tensor:
         """Observation latent for one `(B, N, C)` cloud, via whichever encoder is configured.
@@ -564,8 +594,14 @@ class PCDiffusionModel(nn.Module):
                     "dataloader must be built from this config so observation_delta_indices "
                     f"includes +{self.config.future_latent_horizon}."
                 )
+            fut = future_cloud  # dict of every observation key at the future frame
+            cloud = fut.get(self.config.pc_feature_key)
+            if cloud is None:
+                raise ValueError("future frame carries no point cloud")
             goal_now = batch[self.config.goal_pc_feature_key][:, -1]
-            target = self._encode_obs_latent(future_cloud, goal_now)
+            if self.config.future_latent_object_only:
+                cloud = self._object_crop(cloud, fut.get(self.config.goal_pc_feature_key, goal_now), fut)
+            target = self._encode_obs_latent(cloud, goal_now)
             if self.config.future_latent_stop_grad:
                 # Without this the cheapest way to cut the loss is to shrink the target, which
                 # collapses the shared encoder and takes the policy's features with it.

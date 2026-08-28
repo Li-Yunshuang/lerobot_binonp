@@ -247,6 +247,19 @@ class PCDiffusionConfig(PreTrainedConfig):
     future_latent_horizon: int = 32
     future_latent_stop_grad: bool = True
     future_latent_predictor_dims: tuple[int, ...] = (512, 512)
+    # Restrict the target to the object rather than the whole scene. The cloud contains arms as
+    # well as the object, and the object is stationary outside the push phase, so most of the
+    # frame-to-frame change is arm motion -- which the policy already predicts from
+    # proprioception. Left unmasked, the cheapest way to satisfy this head is to model the robot,
+    # teaching the encoder nothing about object dynamics.
+    #
+    # The dataset carries no per-point labels (segmentation exists only in the simulator at
+    # collection time), so the object region is derived: its centroid is the goal cloud's
+    # centroid minus the remaining displacement, both of which are stored. Validated on
+    # push_pc1024_poses -- the K nearest points to that centroid span 86-88% of the object's
+    # true extent, stably across an episode.
+    future_latent_object_only: bool = False
+    future_latent_object_points: int = 256
 
     @property
     def uses_aux_head(self) -> bool:
