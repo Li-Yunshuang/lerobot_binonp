@@ -7,15 +7,16 @@ new evaluation. Success requires **both** gates: position ≤ 3 cm and orientati
 `pos`/`ori` are mean errors in mm and degrees. `pos gate`/`ori gate` are the ceilings
 each axis would allow if the other were perfect — the lower one is what binds.
 
-## `e75`  (7 results)
+## `e75`  (8 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `pc_diffusion_aux_v1 (K=8)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **80.4%** | 55.4% | 32.1 | 9.0 |
 | `pc_diffusion_aux_v1 (train goals)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **79.7%** | 47.9% | 33.9 | 8.4 |
 | `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **78.6%** | 51.5% | 33.4 | 7.8 |
+| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 276 | **76.8%** | 51.8% | 32.9 | 8.5 |
 | `push_aux_a1a2 (EMA)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **76.4%** | 54.2% | 32.7 | 8.8 |
-| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 46 | **76.1%** | 46.4% | 33.6 | 8.4 |
+| `push_aux_xattn (EMA)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **76.4%** | 47.6% | 33.6 | 9.1 |
 | `push_aux_a1a2 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **75.4%** | 52.1% | 33.1 | 9.1 |
 | `push_dit_v3_all (K=1)` | dit | both | n=1,rot=T | push_v3 | 2115 | 276 | **68.1%** | 39.9% | 38.3 | 10.9 |
 
@@ -26,9 +27,10 @@ verified identical via `goal_dist_m`, so McNemar applies only where marked paire
 |---|---|---|---|---|---|
 | `pc_diffusion_aux_v1 (K=8)` | 336 | yes | +3.9 pp | -0.8–+8.6 | 0.14 |
 | `pc_diffusion_aux_v1 (train goals)` | 336 | **NO** (336 differ) | -3.6 pp | -10.0–+2.9 | n/a |
-| `pc_diffusion_v1 (K=1)` | 56 | yes | -3.6 pp | -18.4–+11.2 | 0.81 |
+| `pc_diffusion_v1 (K=1)` | 336 | yes | +0.3 pp | -5.5–+6.1 | 1 |
 | `push_aux_a1a2 (K=1)` | 336 | yes | +0.6 pp | -5.1–+6.3 | 0.92 |
 | `push_aux_a1a2 (EMA)` | 336 | yes | +2.7 pp | -2.6–+8.0 | 0.38 |
+| `push_aux_xattn (EMA)` | 336 | yes | -3.9 pp | -9.8–+2.0 | 0.24 |
 | `push_dit_v3_all (K=1)` | 336 | yes | -11.6 pp | -18.5–-4.7 | 0.0014 |
 
 
