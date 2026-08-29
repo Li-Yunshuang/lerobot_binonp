@@ -154,6 +154,8 @@ def main() -> None:
         "n_obs_steps": cfg.n_obs_steps,
         "n_action_steps": cfg.n_action_steps,
         "num_samples": int(getattr(cfg, "num_samples", 1) or 1),
+        # Older checkpoints predate the field; they are absolute by construction.
+        "action_space": getattr(cfg, "action_space", "absolute_joint") or "absolute_joint",
         "expects": expects,
         "preprocessing": contract,
     }

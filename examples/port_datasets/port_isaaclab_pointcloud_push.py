@@ -55,6 +55,7 @@ from functools import partial
 from pathlib import Path
 
 import numpy as np
+from scipy.spatial import cKDTree
 import pyarrow.parquet as pq
 
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
@@ -137,6 +138,20 @@ class PortConfig:
     obj_last_xy_halfspan: float = 0.38
     obj_top_margin_m: float = 0.03
     cluster_grid_m: float = 0.03
+    # Object-only observation, matching what a segmentation-based pipeline delivers on
+    # hardware: segment the object in RGB, project onto the registered depth, keep those points.
+    # Here the mask is exact (mesh proximity) rather than predicted. Threshold matches the
+    # collector's own `--obj_seg_thresh`, so the retained set is what the simulator calls the
+    # object. The policy still knows its arm configuration from `observation.state`.
+    drop_arm_points: bool = True
+    obj_seg_thresh_m: float = 0.015
+    # "absolute": store the recorded joint targets unchanged. "delta": store
+    # action[t] - state[t] -- the commanded target relative to the measured joints at that
+    # frame. At execution the consumer adds the live joint position back (command = jp + d),
+    # so the semantic is "move by this much from wherever you are". Checkpoints trained on
+    # deltas carry action_space="delta_joint" and the evaluator refuses to run them as
+    # absolute -- a silent mismatch would command near-zero motion and score ~0.
+    action_mode: str = "absolute"
 
     def crop(self) -> dict[str, tuple[float, float]]:
         return {"x": self.crop_x, "y": self.crop_y, "z": self.crop_z}
@@ -334,6 +349,35 @@ def register_xy(
 # --------------------------------------------------------------------------------------
 
 
+def _keep_object_points(
+    pcd: np.ndarray, obj_t0: np.ndarray, gt_pose: np.ndarray | None, thresh: float, pc_ops
+) -> np.ndarray:
+    """Keep points near the object, dropping the arms. `(T, N, 3) -> (T, N, 3)`.
+
+    The object's frame-0 surface is re-posed onto each frame with the recorded pose, and points
+    within `thresh` of it are kept; the rest are moved far outside the crop so the existing
+    resampler discards them, which avoids a ragged intermediate.
+
+    Needs per-frame ground-truth pose. Real-world sources have none and must use the
+    forward-kinematics arm mask directly -- which is what the evaluator and the robot do.
+    """
+    if gt_pose is None:
+        raise ValueError(
+            "drop_arm_points=True needs per-frame observation.object_pose in the source. "
+            "Re-port with --drop_arm_points=false, or apply FK arm removal at capture time."
+        )
+    out = pcd.copy()
+    far = np.array([1e3, 1e3, 1e3], dtype=pcd.dtype)
+    base_p, base_q = gt_pose[0, :3], gt_pose[0, 3:]
+    for i in range(pcd.shape[0]):
+        surf = pc_ops.transform_points(obj_t0, base_p, base_q, gt_pose[i, :3], gt_pose[i, 3:])
+        # KD-tree, not a dense distance matrix: the brute-force form is ~12 M distances per
+        # frame and 647 k frames across the dataset, which is days of work for the same answer.
+        keep = cKDTree(surf).query(pcd[i], distance_upper_bound=thresh)[0] <= thresh
+        out[i][~keep] = far
+    return out
+
+
 def build_episode_buffer(ep_idx: int, cfg: PortConfig, snap: SourceSnapshot) -> dict | None:
     """Read, preprocess and goal-label one source episode. Runs in a worker process."""
     if cfg.pc_common not in sys.path:
@@ -437,6 +481,19 @@ def build_episode_buffer(ep_idx: int, cfg: PortConfig, snap: SourceSnapshot) -> 
 
     # ---- clouds --------------------------------------------------------------------
     crop = cfg.crop()
+    if cfg.drop_arm_points:
+        # Self-filtering, matching what runs on hardware. The captured cloud is already
+        # table-free (the collector keeps only arm and object returns, and the real perception
+        # pipeline likewise returns no table surface), so removing the robot's own body leaves
+        # the object.
+        #
+        # On the robot this is done from joint encoders: forward kinematics gives link poses and
+        # points within a radius of that skeleton are the arm. Offline there are no link poses in
+        # the source -- only the 14 joint angles -- so the *complement* is computed instead: the
+        # object's frame-0 surface is re-posed onto every frame with the recorded pose, and points
+        # near it are kept. On a table-free cloud the two are the same set, since the object is
+        # all that remains once the arms are gone.
+        pcd = _keep_object_points(pcd, obj_t0, gt_pose, cfg.obj_seg_thresh_m, pc_ops)
     obs_pc, counts = pc_ops.crop_and_resample_batch(pcd, crop, cfg.num_points, rng)
     # Re-pose the t=0 object points onto the goal. With ground truth this carries rotation too,
     # which is what makes rotate/flip representable; the estimated path degenerates to a shift.
@@ -451,6 +508,19 @@ def build_episode_buffer(ep_idx: int, cfg: PortConfig, snap: SourceSnapshot) -> 
     task = snap.tasks.get(0, "Push the object to the goal position.")
     onehot = pc_ops.task_onehot(task)
     goal_vec9 = pc_ops.pose_to_vec9(pose_goal[:3], pose_goal[3:])
+    # The commanded transformation, initial pose -> goal pose: [dt_world (3), rot6d(dR) (6)].
+    # This is the goal *as the robot receives it* -- known at deployment by construction (it is
+    # the command), constant within an episode, and needing no online pose tracking, unlike the
+    # current->goal residual. On push dR is identity and dz is 0, so 7 of 9 dims are constant;
+    # the MIN_MAX normalizer maps a zero-span dim stably to -1 (normalize_processor.py:374), so
+    # they sit inert until rotate/flip data gives them variance -- there, dR *is* the task.
+    d_rot = pc_ops.quat_to_matrix(pose_goal[3:]) @ pc_ops.quat_to_matrix(pose0[3:]).T
+    goal_transform = np.concatenate(
+        [
+            (pose_goal[:3] - pose0[:3]).astype(np.float32),
+            pc_ops.matrix_to_rot6d(d_rot).astype(np.float32),
+        ]
+    )
     buf: dict = {
         "size": t,
         "task": [task] * t,
@@ -466,6 +536,8 @@ def build_episode_buffer(ep_idx: int, cfg: PortConfig, snap: SourceSnapshot) -> 
         # policy's goal vector; the residual to it is what the auxiliary head predicts, so the
         # current pose below is a label and never an input.
         "observation.goal_pose": np.tile(goal_vec9, (t, 1)),
+        # Relative encoding of the same goal; see the comment where it is built.
+        "observation.goal_transform": np.tile(goal_transform, (t, 1)),
         "observation.task_onehot": np.tile(onehot, (t, 1)),
         # Label only. `pose_valid` is 0 for sources without ground truth (real-world data), which
         # lets one schema serve both and the auxiliary loss mask per sample.
@@ -482,7 +554,11 @@ def build_episode_buffer(ep_idx: int, cfg: PortConfig, snap: SourceSnapshot) -> 
             if gt_pose is not None
             else np.zeros((t, 1), dtype=np.float32)
         ),
-        "action": arrays["action"],
+        "action": (
+            arrays["action"] - arrays["observation.state"]
+            if cfg.action_mode == "delta"
+            else arrays["action"]
+        ),
     }
     if cfg.keep_velocity:
         buf["observation.velocity"] = arrays["observation.velocity"]
@@ -517,6 +593,11 @@ def build_features(cfg: PortConfig) -> dict:
             "dtype": "float32",
             "shape": (9,),
             "names": ["x", "y", "z", "r00", "r10", "r20", "r01", "r11", "r21"],
+        },
+        "observation.goal_transform": {
+            "dtype": "float32",
+            "shape": (9,),
+            "names": ["dx", "dy", "dz", "r00", "r10", "r20", "r01", "r11", "r21"],
         },
         "observation.task_onehot": {
             "dtype": "float32",

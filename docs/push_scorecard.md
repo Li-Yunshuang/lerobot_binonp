@@ -7,7 +7,7 @@ new evaluation. Success requires **both** gates: position ≤ 3 cm and orientati
 `pos`/`ori` are mean errors in mm and degrees. `pos gate`/`ori gate` are the ceilings
 each axis would allow if the other were perfect — the lower one is what binds.
 
-## `e75`  (8 results)
+## `e75`  (9 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -18,6 +18,7 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_aux_a1a2 (EMA)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **76.4%** | 54.2% | 32.7 | 8.8 |
 | `push_aux_xattn (EMA)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **76.4%** | 47.6% | 33.6 | 9.1 |
 | `push_aux_a1a2 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **75.4%** | 52.1% | 33.1 | 9.1 |
+| `push_aux_xattn (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **74.3%** | 43.8% | 35.4 | 9.9 |
 | `push_dit_v3_all (K=1)` | dit | both | n=1,rot=T | push_v3 | 2115 | 276 | **68.1%** | 39.9% | 38.3 | 10.9 |
 
 Paired against `pc_diffusion_aux_v1 (K=1)`. Slots are keyed by (batch, env, object) and goals are
@@ -30,6 +31,7 @@ verified identical via `goal_dist_m`, so McNemar applies only where marked paire
 | `pc_diffusion_v1 (K=1)` | 336 | yes | +0.3 pp | -5.5–+6.1 | 1 |
 | `push_aux_a1a2 (K=1)` | 336 | yes | +0.6 pp | -5.1–+6.3 | 0.92 |
 | `push_aux_a1a2 (EMA)` | 336 | yes | +2.7 pp | -2.6–+8.0 | 0.38 |
+| `push_aux_xattn (K=1)` | 336 | yes | -7.7 pp | -14.0–-1.5 | 0.02 |
 | `push_aux_xattn (EMA)` | 336 | yes | -3.9 pp | -9.8–+2.0 | 0.24 |
 | `push_dit_v3_all (K=1)` | 336 | yes | -11.6 pp | -18.5–-4.7 | 0.0014 |
 

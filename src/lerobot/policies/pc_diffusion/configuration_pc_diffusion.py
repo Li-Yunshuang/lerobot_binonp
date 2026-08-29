@@ -75,10 +75,26 @@ class PCDiffusionConfig(PreTrainedConfig):
     pc_feature_dim: int = 256
     pc_feature_key: str = OBS_POINT_CLOUD
     # Applied inside the model, after the processor pipeline. Only meaningful with
-    # POINT_CLOUD -> IDENTITY; it is checkpoint-portable and independent of dataset stats.
+    # POINT_CLOUD -> IDENTITY.
+    #
+    # These map the *capture workspace* -- `_PCD_CROP`, x +/-0.40, y +/-0.30, z -0.03..0.60 --
+    # isotropically into [-1, 1]: centre is the box centre, scale its largest half-extent.
+    # Preferred over per-key MIN_MAX for four reasons:
+    #   * both clouds get the SAME map, so "where the object is vs where it should be" is a
+    #     comparison in one frame. Per-key MIN_MAX gave the observation cloud the arms' extent
+    #     and the goal cloud the object's, a 1.83x stretch on x.
+    #   * isotropic, so a cube stays a cube. MIN_MAX scales each axis independently and hands
+    #     the encoder distorted geometry.
+    #   * independent of dataset statistics, so adding rotate/flip data cannot shift it, and
+    #     re-porting cannot silently change what the numbers mean.
+    #   * the same three constants apply on hardware -- no need to carry sim statistics across
+    #     or recompute them from real captures.
+    # An object spans ~0.46 m in a 0.80 m box, so it occupies ~38% of the range rather than
+    # filling it. That is deliberate: the unused range is what encodes *where in the workspace*
+    # the object sits.
     pc_isotropic_rescale: bool = False
-    pc_center: tuple[float, float, float] = (0.0, 0.0, 0.2)
-    pc_scale: float = 0.7
+    pc_center: tuple[float, float, float] = (0.0, 0.0, 0.285)
+    pc_scale: float = 0.40
 
     # --- joint observation/goal encoding ---
     # Replaces the two independent encoders with one that lets the clouds cross-attend before
@@ -124,6 +140,14 @@ class PCDiffusionConfig(PreTrainedConfig):
     # -- so predicting rotation would regress against a constant. Keep False for that dataset.
     aux_predict_rotation: bool = False
     aux_head_dims: tuple[int, ...] = (256, 256)
+
+    # --- action space (metadata) ---
+    # "absolute_joint": actions are joint targets, commanded as-is. "delta_joint": actions are
+    # action-minus-state at each frame, and the consumer must add the live joint position back
+    # (command = jp + d). The model does not branch on this -- it exists so the checkpoint
+    # declares what its outputs MEAN, the server advertises it, and the evaluator refuses a
+    # mismatch instead of silently commanding near-zero motion.
+    action_space: str = "absolute_joint"
 
     # --- denoiser backbone ---------------------------------------------------------
     # "unet"  -> DiffusionConditionalUnet1d, from the image `diffusion` policy
