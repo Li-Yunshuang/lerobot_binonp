@@ -93,6 +93,11 @@ Demonstrator on these objects (successful demos only, n=769): **8.8 mm** / **3.0
   it — its missing `task_onehot` feature is skipped safely by the model. So typical
   run-to-run variation is small, but a run can still fail badly and silently. Re-run a
   surprising arm before acting on it rather than assuming a fixed noise floor.
+- **Pre-2026-08-29 results were measured on the old input stack** (arms dominating the
+  observation cloud, per-key MIN_MAX with mismatched obs/goal frames, absolute actions).
+  Effects and nulls measured there -- cross-attention, EMA, K=8 averaging, the residual-pose
+  head, goal coverage, the shared-frame fix -- are conclusions about THAT stack only and do
+  not transfer to the cleaned object-only/delta stack. Re-test before citing any of them.
 - **Same-run comparisons are exempt.** EMA vs non-EMA weights from one run, or K=1 vs K=8
   on one checkpoint, share the training trajectory and resolve to ~±7.5 pp at n=336.
 - `pc_diffusion_aux_v1` cannot be retrained; the code that produced it is gone. It remains
