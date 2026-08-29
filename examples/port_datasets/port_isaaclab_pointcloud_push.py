@@ -751,6 +751,11 @@ def parse_args() -> PortConfig:
                         "'achieved' uses the object's final recorded orientation, which bakes the "
                         "demonstrator's own residual error into the goal and mismatches evaluation.")
     p.add_argument("--pc_common", type=str, default=DEFAULT_PC_COMMON)
+    p.add_argument("--action_mode", choices=("absolute", "delta"), default="absolute",
+                   help="'delta' stores action - state per frame; the consumer must add the live "
+                        "joint position back. See PortConfig.action_mode.")
+    p.add_argument("--keep_arm_points", action="store_true",
+                   help="Keep the pre-2026-08-29 observation format (arms + object).")
     a = p.parse_args()
     return PortConfig(
         src_root=a.src_root,
@@ -764,6 +769,8 @@ def parse_args() -> PortConfig:
         keep_velocity=not a.no_velocity,
         goal_orientation=a.goal_orientation,
         pc_common=a.pc_common,
+        action_mode=a.action_mode,
+        drop_arm_points=not a.keep_arm_points,
     )
 
 
