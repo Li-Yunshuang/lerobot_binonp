@@ -37,5 +37,5 @@ echo "[ab] $TAG: $N objects x $ROLL rollouts, $ENVS envs"
 cd /home/samsung/3D_Bimanual_repo/scripts_isaaclab/irregular/eval
 OMNI_KIT_ACCEPT_EULA=YES /home/samsung/miniforge3/envs/isaaclab/bin/python eval_push_policy.py \
   --object_list "$LIST" --num_envs "$ENVS" --episodes_per_object "$ROLL" \
-  --task push --record_video "$REC" --socket "$SOCK" --output "$OUTF" > "$LOG/eval_$TAG.log" 2>&1
+  --task push --record_video "$REC" ${EVAL_STEPS:+--steps "$EVAL_STEPS"} --socket "$SOCK" --output "$OUTF" > "$LOG/eval_$TAG.log" 2>&1
 echo "AB_DONE $TAG -> $OUTF"
