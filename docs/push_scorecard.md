@@ -64,7 +64,7 @@ Demonstrator on these objects (successful demos only, n=769): **8.8 mm** / **3.0
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `push_dit_objabs_xattn (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 161 | **82.6%** | 70.8% | 25.5 | 6.8 |
+| `push_dit_objabs_xattn (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **83.3%** | 72.8% | 25.0 | 6.7 |
 | `push_dit_objabs (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **79.3%** | 67.4% | 27.7 | 7.6 |
 
 
