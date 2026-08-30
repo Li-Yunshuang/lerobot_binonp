@@ -60,10 +60,11 @@ Demonstrator on these objects (successful demos only, n=769): **8.8 mm** / **3.0
 | `push_dit_objdelta (EMA)` | dit | both | n=0,rot=F | push_objonly_delta | all | 276 | **9.1%** | 3.6% | 115.9 | 8.4 |
 
 
-## `e23_ema_fixed`  (1 result)
+## `e23_ema_fixed`  (2 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
+| `push_dit_objabs_xattn (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 161 | **82.6%** | 70.8% | 25.5 | 6.8 |
 | `push_dit_objabs (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **79.3%** | 67.4% | 27.7 | 7.6 |
 
 
