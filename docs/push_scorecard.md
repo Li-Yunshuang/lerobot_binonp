@@ -7,51 +7,6 @@ new evaluation. Success requires **both** gates: position ≤ 3 cm and orientati
 `pos`/`ori` are mean errors in mm and degrees. `pos gate`/`ori gate` are the ceilings
 each axis would allow if the other were perfect — the lower one is what binds.
 
-## `e75`  (9 results)
-
-| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
-|---|---|---|---|---|---|---|---|---|---|---|
-| `pc_diffusion_aux_v1 (K=8)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **80.4%** | 55.4% | 32.1 | 9.0 |
-| `pc_diffusion_aux_v1 (train goals)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **79.7%** | 47.9% | 33.9 | 8.4 |
-| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **78.6%** | 51.5% | 33.4 | 7.8 |
-| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 276 | **76.8%** | 51.8% | 32.9 | 8.5 |
-| `push_aux_a1a2 (EMA)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **76.4%** | 54.2% | 32.7 | 8.8 |
-| `push_aux_xattn (EMA)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **76.4%** | 47.6% | 33.6 | 9.1 |
-| `push_aux_a1a2 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **75.4%** | 52.1% | 33.1 | 9.1 |
-| `push_aux_xattn (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 276 | **74.3%** | 43.8% | 35.4 | 9.9 |
-| `push_dit_v3_all (K=1)` | dit | both | n=1,rot=T | push_v3 | 2115 | 276 | **68.1%** | 39.9% | 38.3 | 10.9 |
-
-Paired against `pc_diffusion_aux_v1 (K=1)`. Slots are keyed by (batch, env, object) and goals are
-verified identical via `goal_dist_m`, so McNemar applies only where marked paired.
-
-| vs baseline | shared | paired? | difference | 95% CI | McNemar p |
-|---|---|---|---|---|---|
-| `pc_diffusion_aux_v1 (K=8)` | 336 | yes | +3.9 pp | -0.8–+8.6 | 0.14 |
-| `pc_diffusion_aux_v1 (train goals)` | 336 | **NO** (336 differ) | -3.6 pp | -10.0–+2.9 | n/a |
-| `pc_diffusion_v1 (K=1)` | 336 | yes | +0.3 pp | -5.5–+6.1 | 1 |
-| `push_aux_a1a2 (K=1)` | 336 | yes | +0.6 pp | -5.1–+6.3 | 0.92 |
-| `push_aux_a1a2 (EMA)` | 336 | yes | +2.7 pp | -2.6–+8.0 | 0.38 |
-| `push_aux_xattn (K=1)` | 336 | yes | -7.7 pp | -14.0–-1.5 | 0.02 |
-| `push_aux_xattn (EMA)` | 336 | yes | -3.9 pp | -9.8–+2.0 | 0.24 |
-| `push_dit_v3_all (K=1)` | 336 | yes | -11.6 pp | -18.5–-4.7 | 0.0014 |
-
-
-Demonstrator on these objects (successful demos only, n=769): **8.8 mm** / **3.0°** mean, 7.8 mm / 2.5° median.
-
-## `common11`  (1 result)
-
-| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
-|---|---|---|---|---|---|---|---|---|---|---|
-| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 48 | **85.4%** | 46.2% | 118.7 | 11.2 |
-
-
-## `common4`  (1 result)
-
-| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
-|---|---|---|---|---|---|---|---|---|---|---|
-| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 48 | **39.6%** | 29.2% | 52.4 | 13.9 |
-
-
 ## `e23`  (2 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
@@ -60,43 +15,14 @@ Demonstrator on these objects (successful demos only, n=769): **8.8 mm** / **3.0
 | `push_dit_objdelta (EMA)` | dit | both | n=0,rot=F | push_objonly_delta | all | 276 | **9.1%** | 3.6% | 115.9 | 8.4 |
 
 
-## `e23_ema_fixed`  (3 results)
+## `e23_ema_fixed`  (4 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `push_dit_objabs_xattn (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **83.3%** | 72.8% | 25.0 | 6.7 |
+| `push_dit_objabs_nogoalvec (K=1)` | dit | points | n=0,rot=F | push_objonly | all | 276 | **80.8%** | 68.8% | 24.2 | 7.3 |
 | `push_dit_objabs_xattn_wam (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **80.1%** | 65.2% | 27.6 | 7.0 |
 | `push_dit_objabs (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **79.3%** | 67.4% | 27.7 | 7.6 |
-
-
-## `heldout`  (11 results)
-
-| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
-|---|---|---|---|---|---|---|---|---|---|---|
-| `push_unet_oldata (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 84 | **79.8%** | 40.9% | 35.1 | 11.3 |
-| `push_unet_v2 (chunk 16)` | unet | both | n=1,rot=T | push_v2 | 1643 | 48 | **77.1%** | 38.1% | 35.4 | 10.8 |
-| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 42 | **76.2%** | 50.0% | 30.8 | 9.1 |
-| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 42 | **73.8%** | 43.7% | 34.2 | 9.5 |
-| `push_dit_v2 (K=1)` | dit | both | n=1,rot=T | push_v2 | 1643 | 96 | **70.8%** | 43.5% | 39.9 | 10.8 |
-| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 96 | **67.7%** | 35.7% | 36.2 | 11.0 |
-| `push_dit_v2 (50 steps)` | dit | both | n=1,rot=T | push_v2 | 1643 | 48 | **66.7%** | 42.9% | 34.7 | 10.5 |
-| `push_unet_recover (K=1)` | unet | points | n=1,rot=F | push_v2 | 1643 | 96 | **61.5%** | 34.5% | 41.1 | 11.2 |
-| `push_dit_v2 (100 steps)` | dit | both | n=1,rot=T | push_v2 | 1643 | 48 | **60.4%** | 32.1% | 35.7 | 11.5 |
-| `push_unet_v2 (chunk 8)` | unet | both | n=1,rot=T | push_v2 | 1643 | 48 | **58.3%** | 27.4% | 42.0 | 11.9 |
-| `pcd_diffusion_v1 (K=1)` | unet | ? | n=0,rot=T | push_pc1024 | 1619 | 42 | **31.0%** | 9.5% | 156.9 | 23.4 |
-
-
-## `indomain`  (7 results)
-
-| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
-|---|---|---|---|---|---|---|---|---|---|---|
-| `pc_diffusion_aux_v1 (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 36 | **80.6%** | 56.1% | 31.1 | 8.0 |
-| `push_unet_oldata (K=1)` | unet | points | n=1,rot=F | push_pc1024_poses | 1619 | 72 | **79.2%** | 53.5% | 32.3 | 8.3 |
-| `pc_diffusion_v1 (K=1)` | unet | points | n=0,rot=F | push_pc1024 | 1619 | 36 | **69.4%** | 49.1% | 35.0 | 9.8 |
-| `push_dit_v2 (K=1)` | dit | both | n=1,rot=T | push_v2 | 1643 | 60 | **66.7%** | 44.0% | 30.0 | 8.5 |
-| `push_unet_recover (K=1)` | unet | points | n=1,rot=F | push_v2 | 1643 | 60 | **66.7%** | 41.7% | 35.6 | 9.5 |
-| `push_unet_v2 (K=1)` | unet | both | n=1,rot=T | push_v2 | 1643 | 60 | **65.0%** | 41.7% | 32.7 | 10.2 |
-| `pcd_diffusion_v1 (K=1)` | unet | ? | n=0,rot=T | push_pc1024 | 1619 | 36 | **19.4%** | 10.5% | 64.8 | 26.6 |
 
 
 ## Reading these numbers

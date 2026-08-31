@@ -9,78 +9,22 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 
 | run | eval | variant | stack | backbone | actions | cross-attn | aux head | goal cond | cloud norm | data | eps | steps |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `pc_diffusion_aux_v1` | e75 | K=1 | old | unet | absolute | no | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
-| `pc_diffusion_aux_v1` | e75 | K=8 | old | unet | absolute | no | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
-| `pc_diffusion_aux_v1` | e75 | train-goal replay | old | unet | absolute | no | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
-| `pc_diffusion_aux_v1` | heldout | K=1 | old | unet | absolute | no | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
-| `pc_diffusion_aux_v1` | indomain | K=1 | old | unet | absolute | no | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
-| `pc_diffusion_v1` | common11 | K=1 | old | unet | absolute | no | none | points | min-max | push_pc1024 | 1619 | 100000 |
-| `pc_diffusion_v1` | e75 | K=1 | old | unet | absolute | no | none | points | min-max | push_pc1024 | 1619 | 100000 |
-| `pc_diffusion_v1` | heldout | K=1 | old | unet | absolute | no | none | points | min-max | push_pc1024 | 1619 | 100000 |
-| `pc_diffusion_v1` | indomain | K=1 | old | unet | absolute | no | none | points | min-max | push_pc1024 | 1619 | 100000 |
-| `pcd_diffusion_v1` | heldout | K=1 | old | unet | absolute | no | none | ? | min-max | push_pc1024 | 1619 | 100000 |
-| `pcd_diffusion_v1` | indomain | K=1 | old | unet | absolute | no | none | ? | min-max | push_pc1024 | 1619 | 100000 |
-| `push_aux_a1a2` | e75 | K=1 | old | unet | absolute | no | residual-pose | points | workspace | push_pc1024_poses | 1619 | 100000 |
-| `push_aux_a1a2` | e75 | EMA | old | unet | absolute | no | residual-pose | points | workspace | push_pc1024_poses | 1619 | 100000 |
-| `push_aux_xattn` | e75 | K=1 | old | unet | absolute | yes | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
-| `push_aux_xattn` | e75 | EMA | old | unet | absolute | yes | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
 | `push_dit_objabs` | e23 | EMA | new | dit | absolute | no | none | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs` | e23 | EMA, corrected harness | new | dit | absolute | no | none | both | workspace | push_objonly | all | 100000 |
+| `push_dit_objabs_nogoalvec` | e23 | EMA, corrected harness | new | dit | absolute | no | none | points | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs_xattn` | e23 | EMA, corrected harness | new | dit | absolute | yes | none | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs_xattn_wam` | e23 | EMA, corrected harness | new | dit | absolute | yes | future-latent | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objdelta` | e23 | EMA | new | dit | delta | no | none | both | workspace | push_objonly_delta | all | 100000 |
-| `push_dit_v2` | heldout | K=1 | old | dit | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
-| `push_dit_v2` | heldout | 100 steps | old | dit | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
-| `push_dit_v2` | heldout | 50 steps | old | dit | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
-| `push_dit_v2` | indomain | K=1 | old | dit | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
-| `push_dit_v3_all` | e75 | K=1 | old | dit | absolute | no | residual-pose | both | min-max | push_v3 | 2115 | 100000 |
-| `push_unet_oldata` | heldout | K=1 | old | unet | absolute | no | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
-| `push_unet_oldata` | indomain | K=1 | old | unet | absolute | no | residual-pose | points | min-max | push_pc1024_poses | 1619 | 100000 |
-| `push_unet_recover` | heldout | K=1 | old | unet | absolute | no | residual-pose | points | min-max | push_v2 | 1643 | 100000 |
-| `push_unet_recover` | indomain | K=1 | old | unet | absolute | no | residual-pose | points | min-max | push_v2 | 1643 | 100000 |
-| `push_unet_v2` | common4 | K=1 | old | unet | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
-| `push_unet_v2` | heldout | K=1 | old | unet | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
-| `push_unet_v2` | heldout | chunk 16 | old | unet | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
-| `push_unet_v2` | heldout | chunk 8 | old | unet | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
-| `push_unet_v2` | indomain | K=1 | old | unet | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
 
 ## Metrics
 
 | run | eval | variant | n | **primary 50mm/0.2** | 95% CI | strict 30mm/0.15 | 40mm/0.15 | pos gate | ori gate | ever-in-goal | pos mean/med/std/p90 (mm) | ori mean/med/std/p90 (deg) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `push_dit_objabs_xattn` | e23 | EMA, corrected harness | 276 | **83.3%** | 78.5–87.3 | 72.8% | 74.6% | 86.6% | 88.4% | 89.9% | 25.0 / 14.8 / 30.5 / 67.3 | 6.7 / 3.2 / 10.6 / 14.2 |
-| `pc_diffusion_aux_v1` | e75 | K=8 | 276 | **80.4%** | 75.4–84.7 | 64.9% | 69.9% | 89.9% | 84.1% | — | 25.0 / 18.3 / 23.6 / 51.5 | 7.5 / 4.5 / 13.7 / 13.7 |
+| `push_dit_objabs_nogoalvec` | e23 | EMA, corrected harness | 276 | **80.8%** | 75.7–85.0 | 68.8% | 75.7% | 90.6% | 84.8% | 86.2% | 24.2 / 16.6 / 25.9 / 49.7 | 7.3 / 3.3 / 11.7 / 18.6 |
 | `push_dit_objabs_xattn_wam` | e23 | EMA, corrected harness | 276 | **80.1%** | 75.0–84.4 | 65.2% | 72.5% | 85.5% | 86.2% | 90.6% | 27.6 / 15.6 / 33.2 / 64.1 | 7.0 / 3.2 / 12.6 / 15.9 |
-| `pc_diffusion_aux_v1` | e75 | train-goal replay | 276 | **79.7%** | 74.6–84.0 | 55.8% | 67.0% | 88.8% | 85.5% | — | 27.4 / 20.8 / 25.3 / 51.5 | 6.0 / 3.9 / 6.3 / 12.8 |
 | `push_dit_objabs` | e23 | EMA, corrected harness | 276 | **79.3%** | 74.2–83.7 | 67.4% | 72.8% | 86.6% | 84.4% | 87.0% | 27.7 / 14.7 / 36.5 / 71.0 | 7.6 / 3.5 / 12.2 / 19.4 |
-| `pc_diffusion_aux_v1` | e75 | K=1 | 276 | **78.6%** | 73.4–83.0 | 60.1% | 67.8% | 88.8% | 83.3% | — | 26.8 / 18.4 / 28.2 / 53.2 | 6.6 / 4.8 / 6.5 / 14.5 |
-| `pc_diffusion_v1` | e75 | K=1 | 276 | **76.8%** | 71.5–81.4 | 61.2% | 67.4% | 86.6% | 81.2% | — | 26.8 / 18.4 / 24.9 / 66.9 | 7.1 / 4.4 / 7.3 / 15.2 |
 | `push_dit_objabs` | e23 | EMA | 276 | **76.8%** | 71.5–81.4 | 62.0% | 68.8% | 84.8% | 82.2% | 85.1% | 27.8 / 18.5 / 28.7 / 61.1 | 8.1 / 4.3 / 10.5 / 19.7 |
-| `push_aux_a1a2` | e75 | EMA | 276 | **76.4%** | 71.1–81.1 | 64.1% | 69.6% | 89.1% | 82.2% | — | 23.8 / 16.8 / 23.5 / 50.1 | 7.0 / 4.8 / 7.3 / 15.5 |
-| `push_aux_xattn` | e75 | EMA | 276 | **76.4%** | 71.1–81.1 | 56.2% | 63.0% | 87.0% | 81.2% | — | 26.5 / 19.3 / 23.3 / 56.7 | 7.7 / 5.2 / 7.5 / 17.2 |
-| `push_aux_a1a2` | e75 | K=1 | 276 | **75.4%** | 70.0–80.1 | 61.6% | 65.6% | 88.8% | 78.3% | — | 25.3 / 18.1 / 24.0 / 57.3 | 7.7 / 4.8 / 7.8 / 18.3 |
-| `push_aux_xattn` | e75 | K=1 | 276 | **74.3%** | 68.8–79.1 | 51.4% | 62.0% | 84.1% | 77.5% | — | 29.0 / 21.2 / 24.6 / 63.1 | 8.8 / 5.7 / 12.1 / 18.7 |
-| `push_unet_oldata` | indomain | K=1 | 228 | **70.6%** | 64.4–76.1 | 53.5% | 61.4% | 82.0% | 82.0% | — | 32.3 / 23.8 / 31.3 / 62.1 | 8.3 / 4.4 / 12.2 / 19.5 |
-| `push_dit_v2` | indomain | K=1 | 168 | **70.2%** | 62.9–76.6 | 44.0% | 56.0% | 87.5% | 76.8% | — | 30.0 / 25.4 / 21.5 / 54.6 | 8.5 / 5.1 / 9.2 / 22.2 |
-| `push_dit_v3_all` | e75 | K=1 | 276 | **68.1%** | 62.4–73.3 | 44.6% | 58.3% | 79.7% | 76.4% | — | 35.1 / 25.6 / 34.9 / 74.3 | 9.7 / 5.5 / 12.6 / 24.0 |
-| `pc_diffusion_aux_v1` | indomain | K=1 | 114 | **67.5%** | 58.5–75.4 | 56.1% | 62.3% | 78.1% | 80.7% | — | 31.1 / 23.1 / 27.6 / 63.6 | 8.0 / 4.0 / 11.3 / 17.5 |
-| `pc_diffusion_aux_v1` | heldout | K=1 | 126 | **66.7%** | 58.1–74.3 | 50.0% | 55.6% | 87.3% | 72.2% | — | 30.8 / 23.4 / 27.2 / 62.7 | 9.1 / 5.5 / 8.9 / 22.5 |
-| `pc_diffusion_v1` | common11 | K=1 | 132 | **66.7%** | 58.3–74.1 | 46.2% | 53.8% | 83.3% | 70.5% | — | 118.7 / 22.4 / 984.9 / 80.6 | 11.2 / 7.4 / 14.3 / 20.9 |
-| `pc_diffusion_v1` | indomain | K=1 | 114 | **65.8%** | 56.7–73.9 | 49.1% | 54.4% | 78.1% | 77.2% | — | 35.0 / 25.0 / 32.2 / 76.6 | 9.8 / 4.6 / 15.1 / 23.5 |
-| `push_unet_v2` | indomain | K=1 | 168 | **63.7%** | 56.2–70.6 | 41.7% | 48.8% | 79.8% | 70.8% | — | 32.7 / 26.5 / 27.6 / 73.6 | 10.2 / 6.8 / 10.9 / 27.5 |
-| `push_dit_v2` | heldout | K=1 | 168 | **63.1%** | 55.6–70.0 | 43.5% | 52.4% | 74.4% | 68.5% | — | 39.9 / 27.4 / 39.0 / 99.6 | 10.8 / 6.7 / 11.2 / 29.6 |
-| `push_unet_oldata` | heldout | K=1 | 252 | **62.7%** | 56.6–68.4 | 40.9% | 50.0% | 81.3% | 67.9% | — | 35.1 / 26.3 / 29.3 / 81.3 | 11.3 / 7.0 / 11.9 / 26.9 |
-| `push_unet_recover` | indomain | K=1 | 168 | **61.3%** | 53.8–68.3 | 41.7% | 52.4% | 76.8% | 72.0% | — | 35.6 / 26.2 / 32.0 / 73.4 | 9.5 / 5.7 / 12.3 / 20.6 |
-| `pc_diffusion_v1` | heldout | K=1 | 126 | **59.5%** | 50.8–67.7 | 43.7% | 48.4% | 78.6% | 70.6% | — | 34.2 / 23.9 / 31.8 / 74.8 | 9.5 / 6.6 / 9.5 / 21.8 |
-| `push_dit_v2` | heldout | 50 steps | 84 | **58.3%** | 47.7–68.3 | 42.9% | 56.0% | 78.6% | 66.7% | — | 34.7 / 26.5 / 29.5 / 66.1 | 10.5 / 5.9 / 10.9 / 29.2 |
-| `push_unet_v2` | heldout | K=1 | 168 | **54.8%** | 47.2–62.1 | 35.7% | 42.9% | 79.2% | 64.3% | — | 36.2 / 28.0 / 31.1 / 70.8 | 11.0 / 7.3 / 10.5 / 26.0 |
-| `push_unet_v2` | heldout | chunk 16 | 84 | **54.8%** | 44.1–65.0 | 38.1% | 47.6% | 76.2% | 64.3% | — | 35.4 / 26.7 / 29.4 / 70.3 | 10.8 / 7.2 / 10.3 / 26.2 |
-| `push_dit_v2` | heldout | 100 steps | 84 | **51.2%** | 40.7–61.6 | 32.1% | 44.0% | 75.0% | 57.1% | — | 35.7 / 29.2 / 26.2 / 70.8 | 11.5 / 7.9 / 10.3 / 30.5 |
-| `push_unet_recover` | heldout | K=1 | 168 | **50.6%** | 43.1–58.1 | 34.5% | 38.7% | 69.0% | 61.3% | — | 41.1 / 31.2 / 32.6 / 88.1 | 11.2 / 8.1 / 11.3 / 27.2 |
-| `push_unet_v2` | heldout | chunk 8 | 84 | **46.4%** | 36.2–57.0 | 27.4% | 34.5% | 72.6% | 57.1% | — | 42.0 / 33.4 / 37.5 / 90.7 | 11.9 / 8.9 / 10.6 / 26.8 |
-| `push_unet_v2` | common4 | K=1 | 48 | **39.6%** | 27.0–53.7 | 29.2% | 37.5% | 52.1% | 58.3% | — | 52.4 / 45.5 / 37.6 / 103.2 | 13.9 / 7.6 / 15.8 / 38.4 |
-| `pcd_diffusion_v1` | heldout | K=1 | 126 | **20.6%** | 14.5–28.5 | 9.5% | 12.7% | 50.8% | 36.5% | — | 156.9 / 48.6 / 1063.9 / 108.1 | 23.4 / 16.4 / 22.3 / 52.6 |
-| `pcd_diffusion_v1` | indomain | K=1 | 114 | **19.3%** | 13.1–27.5 | 10.5% | 11.4% | 47.4% | 34.2% | — | 64.8 / 55.5 / 50.1 / 131.7 | 26.6 / 18.4 / 25.5 / 65.0 |
 | `push_dit_objdelta` | e23 | EMA | 276 | **9.1%** | 6.2–13.0 | 3.6% | 5.4% | 11.2% | 78.6% | — | 115.9 / 111.3 / 57.0 / 192.9 | 8.4 / 4.8 / 10.4 / 20.4 |
 
 ## Reading these
