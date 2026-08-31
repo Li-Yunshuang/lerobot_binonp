@@ -27,6 +27,7 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_dit_objabs` | e23 | EMA | new | dit | absolute | no | none | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs` | e23 | EMA, corrected harness | new | dit | absolute | no | none | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs_xattn` | e23 | EMA, corrected harness | new | dit | absolute | yes | none | both | workspace | push_objonly | all | 100000 |
+| `push_dit_objabs_xattn_wam` | e23 | EMA, corrected harness | new | dit | absolute | yes | future-latent | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objdelta` | e23 | EMA | new | dit | delta | no | none | both | workspace | push_objonly_delta | all | 100000 |
 | `push_dit_v2` | heldout | K=1 | old | dit | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
 | `push_dit_v2` | heldout | 100 steps | old | dit | absolute | no | residual-pose | both | min-max | push_v2 | 1643 | 100000 |
@@ -49,6 +50,7 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `push_dit_objabs_xattn` | e23 | EMA, corrected harness | 276 | **83.3%** | 78.5–87.3 | 72.8% | 74.6% | 86.6% | 88.4% | 89.9% | 25.0 / 14.8 / 30.5 / 67.3 | 6.7 / 3.2 / 10.6 / 14.2 |
 | `pc_diffusion_aux_v1` | e75 | K=8 | 276 | **80.4%** | 75.4–84.7 | 64.9% | 69.9% | 89.9% | 84.1% | — | 25.0 / 18.3 / 23.6 / 51.5 | 7.5 / 4.5 / 13.7 / 13.7 |
+| `push_dit_objabs_xattn_wam` | e23 | EMA, corrected harness | 276 | **80.1%** | 75.0–84.4 | 65.2% | 72.5% | 85.5% | 86.2% | 90.6% | 27.6 / 15.6 / 33.2 / 64.1 | 7.0 / 3.2 / 12.6 / 15.9 |
 | `pc_diffusion_aux_v1` | e75 | train-goal replay | 276 | **79.7%** | 74.6–84.0 | 55.8% | 67.0% | 88.8% | 85.5% | — | 27.4 / 20.8 / 25.3 / 51.5 | 6.0 / 3.9 / 6.3 / 12.8 |
 | `push_dit_objabs` | e23 | EMA, corrected harness | 276 | **79.3%** | 74.2–83.7 | 67.4% | 72.8% | 86.6% | 84.4% | 87.0% | 27.7 / 14.7 / 36.5 / 71.0 | 7.6 / 3.5 / 12.2 / 19.4 |
 | `pc_diffusion_aux_v1` | e75 | K=1 | 276 | **78.6%** | 73.4–83.0 | 60.1% | 67.8% | 88.8% | 83.3% | — | 26.8 / 18.4 / 28.2 / 53.2 | 6.6 / 4.8 / 6.5 / 14.5 |
