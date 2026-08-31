@@ -2,7 +2,8 @@
 
 The reference method for the push primitive, frozen 2026-08-29. Modules built to improve
 success rates are measured **against this**, on the protocol below, changing one thing at a
-time. This document is the map; the linked docs carry the depth.
+time. This document is the map; the linked docs carry the depth. The end-to-end procedure for a
+new machine (rotate/flip included) is [`primitives_training_playbook.md`](./primitives_training_playbook.md).
 
 | | |
 |---|---|

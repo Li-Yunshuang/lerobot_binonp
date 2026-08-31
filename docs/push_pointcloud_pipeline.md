@@ -1,3 +1,6 @@
+> **SUPERSEDED (2026-08-31).** Kept as historical record of the pre-cleaning campaign.
+> Current process: [`primitives_training_playbook.md`](./primitives_training_playbook.md). Current baseline: [`baseline_push_dit.md`](./baseline_push_dit.md).
+
 # Point-cloud push policies: data → training → simulated evaluation
 
 End-to-end runbook for the IsaacLab bimanual push task: turning raw simulator demonstrations into

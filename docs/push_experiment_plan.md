@@ -1,3 +1,6 @@
+> **SUPERSEDED (2026-08-31).** Kept as historical record of the pre-cleaning campaign.
+> Current process: [`primitives_training_playbook.md`](./primitives_training_playbook.md). Current baseline: [`baseline_push_dit.md`](./baseline_push_dit.md).
+
 # Improving push-policy success — current plan
 
 Supersedes the original planning document. The earlier blockers (goal not recorded, sim/real

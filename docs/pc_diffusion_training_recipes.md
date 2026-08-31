@@ -1,3 +1,6 @@
+> **SUPERSEDED (2026-08-31).** Kept as historical record of the pre-cleaning campaign.
+> Current process: [`primitives_training_playbook.md`](./primitives_training_playbook.md). Current baseline: [`baseline_push_dit.md`](./baseline_push_dit.md).
+
 # Training recipes: `aux_v1` and `aux_v1 + point-cloud prediction`
 
 Two runnable configurations for `pc_diffusion` on the push primitive, written so they can be
