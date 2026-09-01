@@ -9,6 +9,7 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 
 | run | eval | variant | stack | backbone | actions | cross-attn | aux head | goal cond | cloud norm | data | eps | steps |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `push_act_objabs` | e23 | EMA, corrected harness | new | unet | absolute | no | none | ? | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs` | e23 | EMA | new | dit | absolute | no | none | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs` | e23 | EMA, corrected harness | new | dit | absolute | no | none | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs_nogoalvec` | e23 | EMA, corrected harness | new | dit | absolute | no | none | points | workspace | push_objonly | all | 100000 |
@@ -27,6 +28,7 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_dit_objabs_xattn_wam` | e23 | EMA, corrected harness | 276 | **80.1%** | 75.0–84.4 | 65.2% | 72.5% | 85.5% | 86.2% | 90.6% | 27.6 / 15.6 / 33.2 / 64.1 | 7.0 / 3.2 / 12.6 / 15.9 |
 | `push_dit_objabs` | e23 | EMA, corrected harness | 276 | **79.3%** | 74.2–83.7 | 67.4% | 72.8% | 86.6% | 84.4% | 87.0% | 27.7 / 14.7 / 36.5 / 71.0 | 7.6 / 3.5 / 12.2 / 19.4 |
 | `push_dit_objabs` | e23 | EMA | 276 | **76.8%** | 71.5–81.4 | 62.0% | 68.8% | 84.8% | 82.2% | 85.1% | 27.8 / 18.5 / 28.7 / 61.1 | 8.1 / 4.3 / 10.5 / 19.7 |
+| `push_act_objabs` | e23 | EMA, corrected harness | 276 | **63.0%** | 57.2–68.5 | 42.0% | 49.6% | 80.4% | 71.7% | 78.6% | 31.9 / 24.9 / 27.4 / 67.1 | 9.8 / 7.4 / 10.0 / 22.0 |
 | `push_dit_objdelta` | e23 | EMA | 276 | **9.1%** | 6.2–13.0 | 3.6% | 5.4% | 11.2% | 78.6% | — | 115.9 / 111.3 / 57.0 / 192.9 | 8.4 / 4.8 / 10.4 / 20.4 |
 
 ## Reading these
