@@ -15,7 +15,7 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_dit_objdelta (EMA)` | dit | both | n=0,rot=F | push_objonly_delta | all | 276 | **9.1%** | 3.6% | 115.9 | 8.4 |
 
 
-## `e23_ema_fixed`  (7 results)
+## `e23_ema_fixed`  (8 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -25,6 +25,7 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_dit_objabs_xattn_wam (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **80.1%** | 65.2% | 27.6 | 7.0 |
 | `push_dit_objabs (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **79.3%** | 67.4% | 27.7 | 7.6 |
 | `push_act_objabs (K=1)` | unet | ? | n=0,rot=F | push_objonly | all | 276 | **63.0%** | 42.0% | 31.9 | 9.8 |
+| `push_act_xattn (K=1)` | unet | ? | n=0,rot=F | push_objonly | all | 276 | **63.0%** | 40.6% | 30.9 | 10.3 |
 | `push_dp3_objabs (K=1)` | unet | points | n=0,rot=F | push_objonly | all | 276 | **51.8%** | 25.0% | 45.1 | 11.2 |
 
 
