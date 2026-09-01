@@ -13,6 +13,7 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_dit_objabs` | e23 | EMA, corrected harness | new | dit | absolute | no | none | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs_nogoalvec` | e23 | EMA, corrected harness | new | dit | absolute | no | none | points | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs_xattn` | e23 | EMA, corrected harness | new | dit | absolute | yes | none | both | workspace | push_objonly | all | 100000 |
+| `push_dit_objabs_xattn_novec` | e23 | EMA, corrected harness | new | dit | absolute | yes | none | points | workspace | push_objonly | all | 100000 |
 | `push_dit_objabs_xattn_wam` | e23 | EMA, corrected harness | new | dit | absolute | yes | future-latent | both | workspace | push_objonly | all | 100000 |
 | `push_dit_objdelta` | e23 | EMA | new | dit | delta | no | none | both | workspace | push_objonly_delta | all | 100000 |
 
@@ -21,6 +22,7 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | run | eval | variant | n | **primary 50mm/0.2** | 95% CI | strict 30mm/0.15 | 40mm/0.15 | pos gate | ori gate | ever-in-goal | pos mean/med/std/p90 (mm) | ori mean/med/std/p90 (deg) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `push_dit_objabs_xattn` | e23 | EMA, corrected harness | 276 | **83.3%** | 78.5–87.3 | 72.8% | 74.6% | 86.6% | 88.4% | 89.9% | 25.0 / 14.8 / 30.5 / 67.3 | 6.7 / 3.2 / 10.6 / 14.2 |
+| `push_dit_objabs_xattn_novec` | e23 | EMA, corrected harness | 276 | **82.2%** | 77.3–86.3 | 72.5% | 77.9% | 87.3% | 85.5% | 90.6% | 24.3 / 14.7 / 31.5 / 61.6 | 6.9 / 3.2 / 10.8 / 19.3 |
 | `push_dit_objabs_nogoalvec` | e23 | EMA, corrected harness | 276 | **80.8%** | 75.7–85.0 | 68.8% | 75.7% | 90.6% | 84.8% | 86.2% | 24.2 / 16.6 / 25.9 / 49.7 | 7.3 / 3.3 / 11.7 / 18.6 |
 | `push_dit_objabs_xattn_wam` | e23 | EMA, corrected harness | 276 | **80.1%** | 75.0–84.4 | 65.2% | 72.5% | 85.5% | 86.2% | 90.6% | 27.6 / 15.6 / 33.2 / 64.1 | 7.0 / 3.2 / 12.6 / 15.9 |
 | `push_dit_objabs` | e23 | EMA, corrected harness | 276 | **79.3%** | 74.2–83.7 | 67.4% | 72.8% | 86.6% | 84.4% | 87.0% | 27.7 / 14.7 / 36.5 / 71.0 | 7.6 / 3.5 / 12.2 / 19.4 |

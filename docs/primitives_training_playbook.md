@@ -5,15 +5,23 @@ manipulation primitive (push today; rotate and flip next), written to be followe
 that has never seen this campaign. Everything here is the corrected-stack procedure as of
 2026-08-31; older documents that disagree carry a superseded banner pointing back here.
 
-**The three standard configurations** (all action-head-only — no auxiliary prediction):
+**The standard configurations** (all action-head-only — no auxiliary prediction). The full 2×2
+over the two goal pathways, n=276 each, paired goals, corrected harness:
 
-| config | goal cloud | goal vector | cross-attention | push result (primary / strict) |
+| config | goal cloud | goal vector | cross-attention | primary / strict |
 |---|---|---|---|---|
 | **reference: cross-attention** | ✓ | ✓ | ✓ | **83.3% / 72.8%** |
-| ablation: no cross-attention | ✓ | ✓ | — | 79.3% / 67.4% |
-| ablation: no goal vector | ✓ | — | — | see `push_experiments.md` |
+| **cross-attention, no vector** | ✓ | — | ✓ | **82.2% / 72.5%** |
+| no cross-attention (baseline) | ✓ | ✓ | — | 79.3% / 67.4% |
+| neither | ✓ | — | — | 80.8% / 68.8% |
 
-Cross-attention vs baseline: +4.0 pp primary (p=0.071), +5.4 pp strict (p=0.036), paired.
+Two effects, no interaction: **cross-attention is worth ~+5 pp at the strict gate in both columns**
+(+5.4 pp p=0.036 with the vector, +5.1 pp p=0.065 without); **the goal vector is worth ~0 in both
+rows** (−0.4 pp p=1.0 inside the full method). On push, the goal *cloud* carries the whole task.
+Caveat before generalising: push's commanded rotation is ~identity, so the vector's six rotation
+dims were near-constant here — on **rotate/flip they carry the task**, and the vector must be
+re-ablated there rather than dropped by inheritance. For push deployment, cross-attention without
+the vector is the simplest recipe at full strength.
 
 ---
 
@@ -118,7 +126,9 @@ the denoiser is unchanged). The goal vector is concatenated into the conditionin
   --policy.goal_feature_key=observation.goal_transform
 ```
 
-**2.3 Ablation — without goal vector** (goal enters as a point cloud only):
+**2.3 Ablation — without goal vector** (goal enters as a point cloud only). Combine
+`--policy.goal_conditioning=points` with §2.1's cross-attention flag for the strong no-vector
+config, or with §2.2 (no cross-attention) for the both-off cell:
 
 ```bash
   --policy.goal_conditioning=points
