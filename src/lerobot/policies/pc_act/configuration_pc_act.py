@@ -63,6 +63,13 @@ class PCACTConfig(PreTrainedConfig):
     pc_feature_key: str = OBS_POINT_CLOUD
     goal_pc_feature_key: str = OBS_GOAL_POINT_CLOUD
     goal_feature_key: str = "observation.goal_transform"
+    # Joint obs<->goal cross-attention encoder (pc_diffusion's CrossAttentionPointEncoder)
+    # instead of two independent PointNetMaxPool encoders. Output width is 2*pc_feature_dim,
+    # identical to the untied pair, so the ACT-side token width is unchanged.
+    pc_cross_attention: bool = False
+    cross_attn_hidden_dim: int = 256
+    cross_attn_num_heads: int = 4
+    cross_attn_num_layers: int = 2
     # The capture workspace mapped isotropically into [-1, 1]; see pc_diffusion's config for the
     # full rationale. Keep these in lockstep with that policy.
     pc_isotropic_rescale: bool = True

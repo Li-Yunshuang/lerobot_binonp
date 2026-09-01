@@ -89,3 +89,18 @@ def test_pose_label_keys_are_stripped_from_inputs():
     cfg.validate_features()
     assert "observation.object_pose" not in cfg.input_features
     assert "observation.pose_valid" not in cfg.input_features
+
+
+def test_cross_attention_variant_trains_and_keeps_token_width():
+    import torch
+
+    cfg = _config()
+    cfg.pc_cross_attention = True
+    pol = PCACTPolicy(cfg)
+    assert pol.pc_encoder is None and pol.cross_encoder is not None
+    assert cfg.env_state_feature.shape[0] == 256 + 256 + 9
+    loss, _ = pol.forward(_batch())
+    loss.backward()
+    assert any(p.grad is not None and p.grad.any() for p in pol.cross_encoder.parameters())
+    obs = {k: v for k, v in _batch().items() if k.startswith("observation")}
+    assert pol.select_action(obs).shape == (2, 14)

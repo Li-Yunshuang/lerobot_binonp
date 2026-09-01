@@ -31,6 +31,7 @@ from torch import Tensor
 
 from lerobot.policies.act.modeling_act import ACT
 from lerobot.policies.pc_diffusion.encoders import make_pc_encoder
+from lerobot.policies.pc_diffusion.encoders.cross_attention import CrossAttentionPointEncoder
 from lerobot.policies.pretrained import PreTrainedPolicy
 from lerobot.utils.constants import ACTION, OBS_ENV_STATE, OBS_STATE
 
@@ -50,18 +51,30 @@ class PCACTPolicy(PreTrainedPolicy):
 
         pc_ft = config.input_features[config.pc_feature_key]
         goal_ft = config.input_features[config.goal_pc_feature_key]
-        self.pc_encoder = make_pc_encoder(
-            config.pc_encoder,
-            num_points=int(pc_ft.shape[0]),
-            in_channels=int(pc_ft.shape[1]),
-            out_dim=config.pc_feature_dim,
-        )
-        self.goal_encoder = make_pc_encoder(
-            config.pc_encoder,
-            num_points=int(goal_ft.shape[0]),
-            in_channels=int(goal_ft.shape[1]),
-            out_dim=config.goal_feature_dim,
-        )
+        if config.pc_cross_attention:
+            self.cross_encoder = CrossAttentionPointEncoder(
+                in_channels=int(pc_ft.shape[1]),
+                out_dim=config.pc_feature_dim,
+                hidden_dim=config.cross_attn_hidden_dim,
+                num_heads=config.cross_attn_num_heads,
+                num_layers=config.cross_attn_num_layers,
+            )
+            self.pc_encoder = None
+            self.goal_encoder = None
+        else:
+            self.cross_encoder = None
+            self.pc_encoder = make_pc_encoder(
+                config.pc_encoder,
+                num_points=int(pc_ft.shape[0]),
+                in_channels=int(pc_ft.shape[1]),
+                out_dim=config.pc_feature_dim,
+            )
+            self.goal_encoder = make_pc_encoder(
+                config.pc_encoder,
+                num_points=int(goal_ft.shape[0]),
+                in_channels=int(goal_ft.shape[1]),
+                out_dim=config.goal_feature_dim,
+            )
         self.register_buffer("_pc_center", torch.tensor(config.pc_center, dtype=torch.float32))
 
         # The stock ACT model, configured through this policy's own config: image_features is
@@ -89,10 +102,11 @@ class PCACTPolicy(PreTrainedPolicy):
         """Encode clouds and build ACT's environment-state token. `(B, N, C)` clouds in."""
         pc = self._rescale(batch[self.config.pc_feature_key])
         goal = self._rescale(batch[self.config.goal_pc_feature_key])
-        env = torch.cat(
-            [self.pc_encoder(pc), self.goal_encoder(goal), batch[self.config.goal_feature_key]],
-            dim=-1,
-        )
+        if self.cross_encoder is not None:
+            cloud_feat = self.cross_encoder(pc, goal)
+        else:
+            cloud_feat = torch.cat([self.pc_encoder(pc), self.goal_encoder(goal)], dim=-1)
+        env = torch.cat([cloud_feat, batch[self.config.goal_feature_key]], dim=-1)
         out = {OBS_STATE: batch[OBS_STATE], OBS_ENV_STATE: env}
         for k in (ACTION, "action_is_pad"):
             if k in batch:
