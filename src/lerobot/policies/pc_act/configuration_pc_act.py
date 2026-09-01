@@ -133,6 +133,13 @@ class PCACTConfig(PreTrainedConfig):
         )
 
     def validate_features(self) -> None:
+        # Same strip as pc_diffusion: pose labels are training bookkeeping, not inference
+        # inputs, but LeRobot types every observation.* key as an input feature. Removing them
+        # here keeps them out of the checkpoint's `expects` contract at eval time.
+        for key in ("observation.object_pose", "observation.pose_valid",
+                    "observation.object_poses", "observation.goal_object_poses"):
+            if self.input_features and key in self.input_features:
+                self.input_features.pop(key)
         for key, what in (
             (self.pc_feature_key, "observation point cloud"),
             (self.goal_pc_feature_key, "goal point cloud"),

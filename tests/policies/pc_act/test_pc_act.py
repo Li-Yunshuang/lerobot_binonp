@@ -78,3 +78,14 @@ def test_select_action_queues_a_chunk():
 
 def test_action_space_metadata_defaults_absolute():
     assert _config().action_space == "absolute_joint"
+
+
+def test_pose_label_keys_are_stripped_from_inputs():
+    from lerobot.configs.types import FeatureType, PolicyFeature
+
+    cfg = _config()
+    cfg.input_features["observation.object_pose"] = PolicyFeature(type=FeatureType.STATE, shape=(7,))
+    cfg.input_features["observation.pose_valid"] = PolicyFeature(type=FeatureType.STATE, shape=(1,))
+    cfg.validate_features()
+    assert "observation.object_pose" not in cfg.input_features
+    assert "observation.pose_valid" not in cfg.input_features
