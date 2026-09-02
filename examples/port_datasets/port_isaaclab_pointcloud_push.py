@@ -121,7 +121,16 @@ class PortConfig:
     # "commanded" (default) puts the goal orientation at the object's START orientation, matching
     # both what the task asks on a push and what the evaluator commands. "achieved" uses the
     # recorded final orientation, which bakes the demonstrator's residual error into the goal.
+    # "flip_commanded" is the flip primitive's equivalent of "commanded": the command is not
+    # "do not rotate" but "tip it flip_angle_deg about the horizontal axis v(d)", so the goal
+    # orientation is that exact rotation applied to the START orientation. Using plain
+    # "commanded" on flip data would set dR to identity and delete the entire task signal;
+    # using "achieved" would train on the demonstrator's angle error (median 0.3 deg, p90 1.9)
+    # as though it were the target.
     goal_orientation: str = "commanded"
+    # Per-episode flip command, read from the source meta/episode_flip.jsonl sidecar. Required
+    # by (and only by) goal_orientation="flip_commanded".
+    flip_meta_name: str = "episode_flip.jsonl"
     max_episodes: int | None = None
     num_workers: int = 6
     seed: int = 0
@@ -178,9 +187,12 @@ class SourceSnapshot:
     episode_lengths: dict[int, int]
     tasks: dict[int, str]
     objects: dict[int, dict]
+    # episode_index -> {"flip_direction": "+x"|"-x"|"+y"|"-y", "flip_angle_deg": float}.
+    # Empty for collections that are not flips.
+    flip_commands: dict[int, dict] = field(default_factory=dict)
 
 
-def freeze_source_snapshot(src_root: Path) -> SourceSnapshot:
+def freeze_source_snapshot(src_root: Path, flip_meta_name: str = "episode_flip.jsonl") -> SourceSnapshot:
     info = json.loads((src_root / "meta" / "info.json").read_text())
     if not str(info.get("codebase_version", "")).startswith("v2"):
         raise ValueError(f"Expected a v2.x source dataset, got {info.get('codebase_version')!r}")
@@ -205,6 +217,14 @@ def freeze_source_snapshot(src_root: Path) -> SourceSnapshot:
                 row = json.loads(line)
                 objects[row["episode_index"]] = row
 
+    flip_commands: dict[int, dict] = {}
+    flip_path = src_root / "meta" / flip_meta_name
+    if flip_path.exists():
+        with open(flip_path) as f:
+            for line in f:
+                row = json.loads(line)
+                flip_commands[row["episode_index"]] = row
+
     return SourceSnapshot(
         total_episodes=int(info["total_episodes"]),
         chunks_size=int(info["chunks_size"]),
@@ -212,6 +232,7 @@ def freeze_source_snapshot(src_root: Path) -> SourceSnapshot:
         episode_lengths=lengths,
         tasks=tasks,
         objects=objects,
+        flip_commands=flip_commands,
     )
 
 
@@ -378,6 +399,92 @@ def _keep_object_points(
     return out
 
 
+# --- Flip command geometry -----------------------------------------------------------------
+# Mirrors the collector's own convention (record_mesh_flip._flip_frame_axes). The four flip
+# directions are defined in the OBJECT frame, so the world-frame flip yaw is W(d) + the object's
+# spawn yaw; the sweep axis is v(d), the LATERAL axis of that frame, horizontal in world XY.
+# The collector scores an episode on rotation about exactly this v, so reconstructing it here
+# reproduces the quantity the task was defined by (verified against the run log: median 0.29 deg,
+# p90 1.86 deg over the achieved rotations).
+_FLIP_DIR_YAW_RAD = {"+x": 0.0, "-x": np.pi, "+y": np.pi / 2, "-y": -np.pi / 2}
+
+
+def quat_mul_wxyz(a: np.ndarray, b: np.ndarray) -> np.ndarray:
+    """Hamilton product, wxyz. ``quat_mul(dq, q0)`` rotates q0 by dq in the WORLD frame -- the
+    same left-multiplication the collector uses (dq = q_final * conj(q_init))."""
+    w1, x1, y1, z1 = a
+    w2, x2, y2, z2 = b
+    return np.array([
+        w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+        w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+        w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+        w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+    ], dtype=np.float64)
+
+
+def yaw_from_quat_wxyz(q: np.ndarray) -> float:
+    """Rotation about world Z. The flip collector applies the spawn yaw as a world-Z spin on top
+    of an identity default orientation, so on flip data this recovers that spawn yaw directly
+    (measured |qx,qy| <= 0.017 at t=0, i.e. the objects rest essentially upright)."""
+    w, x, y, z = (float(v) for v in q)
+    return float(np.arctan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z)))
+
+
+def flip_command_quat(q0: np.ndarray, direction: str, angle_deg: float) -> np.ndarray:
+    """The COMMANDED world-frame rotation for one flip: ``angle_deg`` about the horizontal axis
+    v(d) of the object's own flip frame. Returns a wxyz quaternion to left-multiply onto q0."""
+    if direction not in _FLIP_DIR_YAW_RAD:
+        raise ValueError(f"unknown flip direction {direction!r}")
+    yaw = _FLIP_DIR_YAW_RAD[direction] + yaw_from_quat_wxyz(q0)
+    axis = np.array([-np.sin(yaw), np.cos(yaw), 0.0], dtype=np.float64)
+    half = 0.5 * np.radians(float(angle_deg))
+    return np.concatenate([[np.cos(half)], axis * np.sin(half)])
+
+
+# Vertices within this height of the object's lowest point are its resting footprint. Same
+# constant, and same role, as record_mesh_flip._PIVOT_BAND_M.
+_FLIP_PIVOT_BAND_M = 0.005
+
+
+def flip_pivot_point(obj_pts: np.ndarray, u: np.ndarray) -> np.ndarray:
+    """The edge the object tips over: the +u extreme of its resting footprint, at table height."""
+    z_min = float(obj_pts[:, 2].min())
+    foot = obj_pts[obj_pts[:, 2] <= z_min + _FLIP_PIVOT_BAND_M]
+    if foot.shape[0] < 3:
+        foot = obj_pts
+    piv = foot[int(np.argmax(foot @ u))].astype(np.float64).copy()
+    piv[2] = z_min
+    return piv
+
+
+def flip_command_pose(
+    obj_t0: np.ndarray, pose0: np.ndarray, direction: str, angle_deg: float
+) -> tuple[np.ndarray, np.ndarray]:
+    """The COMMANDED goal pose of a flip: rotate the object ``angle_deg`` about the horizontal
+    axis v(d) passing through its pivot edge.
+
+    Both parts are computable from what a deployment actually has -- the observed initial cloud
+    and the commanded direction -- which is the property the goal is required to have
+    (primitive_dataset_pipeline.md 2.6, "known at deployment by construction"). The achieved
+    final pose is NOT: nothing knows where the object will come to rest before it is pushed.
+    Push can use the achieved position because there the demonstrator was driven to a commanded
+    goal and lands a median 8.6 mm from it; on flip the same substitution is off by a median
+    36 mm (p90 86 mm), larger than push's entire 30 mm success gate, so the commanded pose has
+    to be constructed rather than borrowed from the outcome.
+    """
+    yaw = _FLIP_DIR_YAW_RAD[direction] + yaw_from_quat_wxyz(pose0[3:])
+    u = np.array([np.cos(yaw), np.sin(yaw), 0.0], dtype=np.float64)
+    v = np.array([-np.sin(yaw), np.cos(yaw), 0.0], dtype=np.float64)
+    ang = np.radians(float(angle_deg))
+    K = np.array([[0.0, -v[2], v[1]], [v[2], 0.0, -v[0]], [-v[1], v[0], 0.0]], dtype=np.float64)
+    rot = np.eye(3) + np.sin(ang) * K + (1.0 - np.cos(ang)) * (K @ K)
+    piv = flip_pivot_point(np.asarray(obj_t0, dtype=np.float64), u)
+    goal_pos = piv + rot @ (pose0[:3].astype(np.float64) - piv)
+    dq = flip_command_quat(pose0[3:], direction, angle_deg)
+    goal_quat = quat_mul_wxyz(dq, pose0[3:].astype(np.float64))
+    return goal_pos.astype(np.float32), goal_quat.astype(np.float32)
+
+
 def build_episode_buffer(ep_idx: int, cfg: PortConfig, snap: SourceSnapshot) -> dict | None:
     """Read, preprocess and goal-label one source episode. Runs in a worker process."""
     if cfg.pc_common not in sys.path:
@@ -441,7 +548,27 @@ def build_episode_buffer(ep_idx: int, cfg: PortConfig, snap: SourceSnapshot) -> 
         if gi < 0:
             return {"_skip": "no_plausible_pose", **diag}
         pose0, pose_goal = gt_pose[0], gt_pose[gi].copy()
-        if cfg.goal_orientation == "commanded":
+        if cfg.goal_orientation == "flip_commanded":
+            # The flip command IS a rotation, so the goal orientation is the commanded turn
+            # applied to the start orientation -- not the start orientation (that is push's
+            # "do not rotate" command, and on flip data it would zero dR and delete the task)
+            # and not the achieved orientation (that is the demonstrator's residual error).
+            # The goal POSITION stays the achieved last-plausible one, exactly as on push.
+            cmd = snap.flip_commands.get(ep_idx)
+            if cmd is None:
+                return {"_skip": "no_flip_command", **diag}
+            g_pos, g_quat = flip_command_pose(
+                obj_t0, pose0, cmd["flip_direction"], cmd["flip_angle_deg"]
+            )
+            _ach = pose_goal[:3].astype(np.float64).copy()
+            pose_goal[:3] = g_pos.astype(pose_goal.dtype)
+            pose_goal[3:] = g_quat.astype(pose_goal.dtype)
+            diag.update(flip_direction=cmd["flip_direction"],
+                        flip_angle_deg=float(cmd["flip_angle_deg"]),
+                        # how far the commanded pose sits from where the demo actually ended;
+                        # a distribution to watch, not a gate
+                        flip_cmd_vs_achieved_m=float(np.linalg.norm(g_pos - _ach)))
+        elif cfg.goal_orientation == "commanded":
             # The goal ORIENTATION is the one the task commands, not the one the demonstrator
             # happened to reach. On a push the command is "do not rotate it", so the goal
             # orientation is the start orientation -- which is also exactly what the evaluator
@@ -631,9 +758,28 @@ def main(cfg: PortConfig) -> None:
     sys.path.insert(0, cfg.pc_common)
     import pc_ops
 
-    snap = freeze_source_snapshot(src)
+    snap = freeze_source_snapshot(src, cfg.flip_meta_name)
     n_eps = snap.total_episodes if cfg.max_episodes is None else min(snap.total_episodes, cfg.max_episodes)
     logger.info("source: %d episodes @ %.1f fps (frozen snapshot)", n_eps, snap.fps)
+
+    # Fail at startup, not 2400 episodes in: flip_commanded is meaningless without the sidecar,
+    # and a missing one would otherwise skip every episode one at a time.
+    if cfg.goal_orientation == "flip_commanded":
+        missing = [i for i in range(n_eps) if i not in snap.flip_commands]
+        if missing:
+            raise ValueError(
+                f"--goal_orientation flip_commanded needs meta/{cfg.flip_meta_name} to cover "
+                f"every episode; {len(missing)} missing (first: {missing[:5]}). "
+                "Generate it with dataset_collection/make_flip_episode_meta.py."
+            )
+        dirs = sorted({r["flip_direction"] for r in snap.flip_commands.values()})
+        logger.info("flip commands: %d episodes, directions %s", len(snap.flip_commands), dirs)
+    elif snap.flip_commands:
+        logger.warning(
+            "source carries meta/%s (a flip collection) but --goal_orientation is %r; "
+            "dR will be identity and the flip task will not be represented.",
+            cfg.flip_meta_name, cfg.goal_orientation,
+        )
 
     features = build_features(cfg)
     if (dst / "meta" / "info.json").exists():
@@ -744,7 +890,8 @@ def parse_args() -> PortConfig:
     p.add_argument("--max_episodes", type=int, default=None)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--no_velocity", action="store_true")
-    p.add_argument("--goal_orientation", choices=("commanded", "achieved"), default="commanded",
+    p.add_argument("--goal_orientation", choices=("commanded", "achieved", "flip_commanded"),
+                   default="commanded",
                    help="'commanded' sets the goal orientation to the object's START orientation, "
                         "which is what the task actually asks for on a push ('move it there without "
                         "rotating it') and what the simulator commands at evaluation time. "
