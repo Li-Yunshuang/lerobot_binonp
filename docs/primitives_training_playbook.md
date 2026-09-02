@@ -142,6 +142,33 @@ Model shape (reference config): 2-frame conditioning
 [state 14 ‖ obs-cloud 256 ‖ goal-cloud 256 ‖ goal_transform 9] × 2 → adaLN-Zero into a 13×1024
 RoPE DiT over 64 action tokens; ε-prediction, DDIM-10 at inference; 64-step chunk, 32 executed.
 
+## 2b. Benchmark baselines (other method families, same inputs and protocol)
+
+Both are pure configurations -- no code beyond what the repo carries. Use the §2 common base
+command with `--policy.type`/flags below; evaluate identically to §3. Push results (n=276):
+
+**ACT** (Zhao et al. 2023; `pc_act` policy -- stock ACT head on our encoders): 63.0% / 42.0%.
+Cross-attention (`--policy.pc_cross_attention=true`) does nothing for it (63.0% / 40.6%) --
+the correspondence gain is diffusion-head-specific.
+
+```bash
+  --policy.type=pc_act            # chunk 64 / execute 32, MEAN_STD, lr 1e-4 are its defaults
+```
+
+**DP3** (Ze et al. 2024, adapted): 51.8% / 25.0%. Faithful pieces: 64-d compact encoders, DP
+UNet1D, sample prediction, DDIM 100/10, To=2. Adaptations: goal cloud through a second 64-d
+encoder (the task is goal-conditioned; original DP3 has no goal input), H=8/Ta=6 instead of
+4/3 (our UNet needs horizon % 8 == 0), state concatenated raw, our standard budget.
+
+```bash
+  --policy.type=pc_diffusion --policy.backbone=unet --policy.down_dims='[256,512,1024]' \
+  --policy.horizon=8 --policy.n_action_steps=6 \
+  --policy.pc_feature_dim=64 --policy.prediction_type=sample \
+  --policy.normalization_mapping='{"POINT_CLOUD":"IDENTITY","STATE":"MIN_MAX","ACTION":"MIN_MAX","VISUAL":"IDENTITY"}' \
+  --policy.pc_isotropic_rescale=true --policy.goal_conditioning=points \
+  --policy.use_task_onehot=false --policy.num_objects=0 --policy.action_space=absolute_joint
+```
+
 ## 3. Evaluation
 
 Protocol (frozen): [`push_benchmark_protocol.md`](./push_benchmark_protocol.md). Harness must be
