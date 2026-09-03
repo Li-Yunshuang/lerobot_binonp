@@ -1,0 +1,55 @@
+{
+ "created": "2026-09-01",
+ "seed": 20260901,
+ "source": "push_data_v2 meta/attempts.jsonl (30 expert attempts/object)",
+ "rule": "cluster by base geometry (orientation variants travel together); exclude expert-0% clusters entirely; pin parametric frustum_* family to train (near-identical siblings would straddle any split); stratify eligible clusters into expert-success quartiles; hold out 22% per quartile (unseen); sample equal-count difficulty-matched twins from the remainder (seen-eval).",
+ "clusters": {
+  "total": 64,
+  "zero_expert_excluded": [
+   "Pet_Dophilus_powder"
+  ],
+  "frustum_pinned_train": 2,
+  "eligible": 61
+ },
+ "unseen_clusters": [
+  "ACE_Coffee_Mug_Kristen_16_oz_cup",
+  "Arm_Hammer_Diaper_Pail_Refills_12_Pack_MFWkmoweejt",
+  "BIA_Cordon_Bleu_White_Porcelain_Utensil_Holder_900028",
+  "Ecoforms_Plant_Container_QP_Harvest",
+  "Fujifilm_instax_SHARE_SP1_10_photos",
+  "Granimals_20_Wooden_ABC_Blocks_Wagon_85VdSftGsLi",
+  "Markings_Letter_Holder",
+  "Olive_Kids_Trains_Planes_Trucks_Munch_n_Lunch_Bag",
+  "Paint_Maker",
+  "Perricone_MD_No_Lipstick_Lipstick",
+  "Retail_Leadership_Summit_tQFCizMt6g0",
+  "Shurtape_Tape_Purple_CP28",
+  "Threshold_Porcelain_Spoon_Rest_White"
+ ],
+ "seen_eval_clusters": [
+  "Borage_GLA240Gamma_Tocopherol",
+  "Bradshaw_International_11642_7_Qt_MP_Plastic_Bowl",
+  "Cole_Hardware_School_Bell_Solid_Brass_38",
+  "Cootie_Game_tDhURNbfU5J",
+  "Crunch_Girl_Scouts_Candy_Bars_Peanut_Butter_Creme_78_oz_box",
+  "Dell_Ink_Cartridge",
+  "Full_Circle_Happy_Scraps_Out_Collector_Gray",
+  "JarroSil_Activated_Silicon_5exdZHIeLAp",
+  "Office_Depot_Dell_Series_11_Remanufactured_Ink_Cartridge_Black",
+  "Office_Depot_Dell_Series_1_Remanufactured_Ink_Cartridge_TriColor",
+  "Office_Depot_HP_74XL75_Remanufactured_Ink_Cartridges_BlackTriColor_2_count",
+  "Philips_EcoVantage_43_W_Light_Bulbs_Natural_Light_2_pack",
+  "Phillips_Caplets_Size_24"
+ ],
+ "counts": {
+  "train_objects": 80,
+  "unseen_objects": 20,
+  "seen_eval_objects": 23
+ },
+ "expert_success": {
+  "train_mean": 0.656,
+  "unseen_mean": 0.683,
+  "seen_eval_mean": 0.688
+ },
+ "train_episodes": 1545
+}
