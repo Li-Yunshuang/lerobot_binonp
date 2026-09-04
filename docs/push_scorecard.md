@@ -29,6 +29,20 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_dp3_objabs (K=1)` | unet | points | n=0,rot=F | push_objonly | all | 276 | **51.8%** | 25.0% | 45.1 | 11.2 |
 
 
+## `seenv2_ema_fixed`  (1 result)
+
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_v2_xattn (K=1)` | dit | both | n=0,rot=F | push_v2obj | 1545 | 72 | **70.8%** | 59.8% | 23.8 | 10.4 |
+
+
+## `unseenv2_ema_fixed`  (1 result)
+
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_v2_xattn (K=1)` | dit | both | n=0,rot=F | push_v2obj | 1545 | 36 | **58.3%** | 63.3% | 25.3 | 9.6 |
+
+
 ## Reading these numbers
 
 - **Compare only within an eval-set section.** The same checkpoint scores several points
