@@ -25,6 +25,8 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_v2_base` | unseenv2 | EMA, corrected harness | old | dit | absolute | no | none | both | workspace | push_v2obj | 1545 | 100000 |
 | `push_v2_dp3` | seenv2 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v2obj | 1545 | 100000 |
 | `push_v2_dp3` | unseenv2 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v2obj | 1545 | 100000 |
+| `push_v2_neither` | seenv2 | EMA, corrected harness | old | dit | absolute | no | none | points | workspace | push_v2obj | 1545 | 100000 |
+| `push_v2_neither` | unseenv2 | EMA, corrected harness | old | dit | absolute | no | none | points | workspace | push_v2obj | 1545 | 100000 |
 | `push_v2_xattn` | seenv2 | EMA, corrected harness | old | dit | absolute | yes | none | both | workspace | push_v2obj | 1545 | 100000 |
 | `push_v2_xattn` | unseenv2 | EMA, corrected harness | old | dit | absolute | yes | none | both | workspace | push_v2obj | 1545 | 100000 |
 
@@ -38,11 +40,13 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_dit_objabs_xattn_wam` | e23 | EMA, corrected harness | 276 | **80.1%** | 75.0–84.4 | 65.2% | 72.5% | 85.5% | 86.2% | 90.6% | 27.6 / 15.6 / 33.2 / 64.1 | 7.0 / 3.2 / 12.6 / 15.9 |
 | `push_dit_objabs` | e23 | EMA, corrected harness | 276 | **79.3%** | 74.2–83.7 | 67.4% | 72.8% | 86.6% | 84.4% | 87.0% | 27.7 / 14.7 / 36.5 / 71.0 | 7.6 / 3.5 / 12.2 / 19.4 |
 | `push_dit_objabs` | e23 | EMA | 276 | **76.8%** | 71.5–81.4 | 62.0% | 68.8% | 84.8% | 82.2% | 85.1% | 27.8 / 18.5 / 28.7 / 61.1 | 8.1 / 4.3 / 10.5 / 19.7 |
+| `push_v2_neither` | unseenv2 | EMA, corrected harness | 240 | **72.9%** | 67.0–78.1 | 59.6% | 63.3% | 88.3% | 76.7% | 84.2% | 24.3 / 17.0 / 23.3 / 59.2 | 8.0 / 4.9 / 9.8 / 18.9 |
 | `push_v2_xattn` | unseenv2 | EMA, corrected harness | 240 | **72.9%** | 67.0–78.1 | 63.3% | 67.5% | 87.5% | 75.0% | 84.6% | 25.3 / 15.1 / 29.2 / 58.5 | 9.6 / 5.0 / 15.2 / 22.4 |
 | `push_v2_xattn` | seenv2 | EMA, corrected harness | 276 | **72.5%** | 66.9–77.4 | 59.8% | 63.8% | 89.9% | 74.6% | 76.8% | 23.8 / 16.7 / 25.2 / 50.1 | 10.4 / 4.4 / 15.6 / 29.9 |
 | `push_v2_base` | seenv2 | EMA, corrected harness | 276 | **71.4%** | 65.8–76.4 | 58.3% | 62.7% | 90.6% | 72.8% | 78.3% | 23.8 / 16.3 / 22.6 / 48.6 | 10.3 / 5.2 / 14.4 / 24.7 |
 | `push_v2_base` | unseenv2 | EMA, corrected harness | 240 | **68.3%** | 62.2–73.9 | 54.6% | 57.5% | 86.7% | 72.9% | 79.6% | 52.0 / 16.6 / 413.1 / 57.3 | 11.2 / 5.3 / 18.3 / 29.0 |
 | `push_v2_act` | seenv2 | EMA, corrected harness | 276 | **65.9%** | 60.2–71.3 | 50.0% | 57.6% | 85.5% | 71.7% | 73.6% | 29.5 / 22.4 / 27.1 / 58.8 | 10.0 / 5.3 / 12.5 / 27.1 |
+| `push_v2_neither` | seenv2 | EMA, corrected harness | 276 | **65.2%** | 59.4–70.6 | 52.2% | 56.9% | 89.9% | 67.4% | 71.7% | 23.5 / 16.7 / 22.5 / 50.7 | 11.7 / 6.3 / 14.4 / 29.3 |
 | `push_act_objabs` | e23 | EMA, corrected harness | 276 | **63.0%** | 57.2–68.5 | 42.0% | 49.6% | 80.4% | 71.7% | 78.6% | 31.9 / 24.9 / 27.4 / 67.1 | 9.8 / 7.4 / 10.0 / 22.0 |
 | `push_act_xattn` | e23 | EMA, corrected harness | 276 | **63.0%** | 57.2–68.5 | 40.6% | 49.6% | 83.0% | 69.6% | 76.8% | 30.9 / 23.2 / 24.3 / 68.1 | 10.3 / 7.1 / 10.4 / 26.5 |
 | `push_v2_act` | unseenv2 | EMA, corrected harness | 240 | **61.7%** | 55.4–67.6 | 44.6% | 49.6% | 81.2% | 66.2% | 79.6% | 32.3 / 24.3 / 30.0 / 72.2 | 11.3 / 7.8 / 15.4 / 27.1 |

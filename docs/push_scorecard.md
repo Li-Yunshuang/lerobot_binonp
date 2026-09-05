@@ -29,20 +29,22 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_dp3_objabs (K=1)` | unet | points | n=0,rot=F | push_objonly | all | 276 | **51.8%** | 25.0% | 45.1 | 11.2 |
 
 
-## `seenv2_ema_fixed`  (4 results)
+## `seenv2_ema_fixed`  (5 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `push_v2_xattn (K=1)` | dit | both | n=0,rot=F | push_v2obj | 1545 | 72 | **70.8%** | 59.8% | 23.8 | 10.4 |
 | `push_v2_act (K=1)` | unet | ? | n=0,rot=F | push_v2obj | 1545 | 72 | **69.4%** | 50.0% | 29.5 | 10.0 |
 | `push_v2_base (K=1)` | dit | both | n=0,rot=F | push_v2obj | 1545 | 72 | **66.7%** | 58.3% | 23.8 | 10.3 |
+| `push_v2_neither (K=1)` | dit | points | n=0,rot=F | push_v2obj | 1545 | 72 | **61.1%** | 52.2% | 23.5 | 11.7 |
 | `push_v2_dp3 (K=1)` | unet | points | n=0,rot=F | push_v2obj | 1545 | 72 | **51.4%** | 31.5% | 43.5 | 12.2 |
 
 
-## `unseenv2_ema_fixed`  (4 results)
+## `unseenv2_ema_fixed`  (5 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
+| `push_v2_neither (K=1)` | dit | points | n=0,rot=F | push_v2obj | 1545 | 36 | **63.9%** | 59.6% | 24.3 | 8.0 |
 | `push_v2_dp3 (K=1)` | unet | points | n=0,rot=F | push_v2obj | 1545 | 36 | **61.1%** | 33.3% | 46.2 | 10.6 |
 | `push_v2_xattn (K=1)` | dit | both | n=0,rot=F | push_v2obj | 1545 | 36 | **58.3%** | 63.3% | 25.3 | 9.6 |
 | `push_v2_base (K=1)` | dit | both | n=0,rot=F | push_v2obj | 1545 | 36 | **55.6%** | 54.6% | 52.0 | 11.2 |
