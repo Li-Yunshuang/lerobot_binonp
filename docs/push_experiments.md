@@ -29,6 +29,8 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_v2_neither` | unseenv2 | EMA, corrected harness | old | dit | absolute | no | none | points | workspace | push_v2obj | 1545 | 100000 |
 | `push_v2_xattn` | seenv2 | EMA, corrected harness | old | dit | absolute | yes | none | both | workspace | push_v2obj | 1545 | 100000 |
 | `push_v2_xattn` | unseenv2 | EMA, corrected harness | old | dit | absolute | yes | none | both | workspace | push_v2obj | 1545 | 100000 |
+| `push_v2_xattn_novec` | seenv2 | EMA, corrected harness | old | dit | absolute | yes | none | points | workspace | push_v2obj | 1545 | 100000 |
+| `push_v2_xattn_novec` | unseenv2 | EMA, corrected harness | old | dit | absolute | yes | none | points | workspace | push_v2obj | 1545 | 100000 |
 
 ## Metrics
 
@@ -44,6 +46,8 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_v2_xattn` | unseenv2 | EMA, corrected harness | 240 | **72.9%** | 67.0–78.1 | 63.3% | 67.5% | 87.5% | 75.0% | 84.6% | 25.3 / 15.1 / 29.2 / 58.5 | 9.6 / 5.0 / 15.2 / 22.4 |
 | `push_v2_xattn` | seenv2 | EMA, corrected harness | 276 | **72.5%** | 66.9–77.4 | 59.8% | 63.8% | 89.9% | 74.6% | 76.8% | 23.8 / 16.7 / 25.2 / 50.1 | 10.4 / 4.4 / 15.6 / 29.9 |
 | `push_v2_base` | seenv2 | EMA, corrected harness | 276 | **71.4%** | 65.8–76.4 | 58.3% | 62.7% | 90.6% | 72.8% | 78.3% | 23.8 / 16.3 / 22.6 / 48.6 | 10.3 / 5.2 / 14.4 / 24.7 |
+| `push_v2_xattn_novec` | unseenv2 | EMA, corrected harness | 240 | **71.2%** | 65.2–76.6 | 60.4% | 62.5% | 89.6% | 73.8% | 81.7% | 23.4 / 14.2 / 27.6 / 51.6 | 9.3 / 4.7 / 11.2 / 25.0 |
+| `push_v2_xattn_novec` | seenv2 | EMA, corrected harness | 276 | **69.9%** | 64.3–75.0 | 60.5% | 63.8% | 92.4% | 72.5% | 77.5% | 19.3 / 12.6 / 18.9 / 47.6 | 10.0 / 4.3 / 13.5 / 26.2 |
 | `push_v2_base` | unseenv2 | EMA, corrected harness | 240 | **68.3%** | 62.2–73.9 | 54.6% | 57.5% | 86.7% | 72.9% | 79.6% | 52.0 / 16.6 / 413.1 / 57.3 | 11.2 / 5.3 / 18.3 / 29.0 |
 | `push_v2_act` | seenv2 | EMA, corrected harness | 276 | **65.9%** | 60.2–71.3 | 50.0% | 57.6% | 85.5% | 71.7% | 73.6% | 29.5 / 22.4 / 27.1 / 58.8 | 10.0 / 5.3 / 12.5 / 27.1 |
 | `push_v2_neither` | seenv2 | EMA, corrected harness | 276 | **65.2%** | 59.4–70.6 | 52.2% | 56.9% | 89.9% | 67.4% | 71.7% | 23.5 / 16.7 / 22.5 / 50.7 | 11.7 / 6.3 / 14.4 / 29.3 |
