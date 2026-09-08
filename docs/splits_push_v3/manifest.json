@@ -1,0 +1,9 @@
+{
+ "created": "2026-09-08",
+ "rule": "expert success > 0.75 over 30 attempts, push_data (v3) attempts.jsonl",
+ "objects": 45,
+ "halves": [
+  23,
+  22
+ ]
+}
