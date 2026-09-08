@@ -153,7 +153,7 @@ HUD together.
 
 ```
 position   top-left (5, 5)              _HUD_PAD
-size       172 x 58 px                  _HUD_W, _HUD_H
+size       172 x 58 px (flip, 5 rows); push uses 172 x 48 after dropping STEP   _HUD_W, _HUD_H
 scrim      rgb(12,17,23) @ 66%          _HUD_BG, _HUD_SCRIM
 line pitch 10 px                        _HUD_LINE
 bar        x=51, 56 x 5 px              _HUD_BAR_X/W/H
