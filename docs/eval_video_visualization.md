@@ -163,16 +163,23 @@ labels     rgb(150,166,182) dim         _HUD_DIM
 values     green on-goal / blue pending _GHOST_RGB_ONGOAL / _PENDING
 ```
 
-Five rows. Rows 1-2 and row 5 are fixed across primitives; rows 3-4 carry the primitive's own
-success terms:
+Rows 1-2 are fixed across primitives; rows 3-4 carry the primitive's own success terms; row 5
+(STEP) exists only where it carries information beyond a clock:
 
-| row | push | flip | rotate (suggested) |
+| row | push (as of 2026-09-07) | flip | rotate (suggested) |
 |---|---|---|---|
 | 1 | `ON GOAL` / `PENDING` | same | same |
 | 2 | object name | same | same |
-| 3 | `POS MM` bar | `FACE` state | `POS MM` bar, if position gates |
-| 4 | `ORI DEG` bar | `ORI DEG` bar (on-axis) | `ORI DEG` bar (about the commanded axis) |
-| 5 | `STEP` bar | `STEP <dir>` bar | `STEP` bar |
+| 3 | `POS MM` bar (30 mm gate) | `FACE` state | `POS MM` bar, if position gates |
+| 4 | `ORI RAD` bar (`0.04/0.15`) | `ORI DEG` bar (on-axis) | `ORI` bar (about the commanded axis) |
+| 5 | -- (dropped) | `STEP <dir>` bar | `STEP <dir>` bar, direction label |
+
+Push dropped its STEP row (2026-09-07): a bare progress clock told the viewer nothing the video
+timeline does not, and every removed row is HUD off the scene. Flip and rotate keep row 5
+because theirs carries the **commanded direction**, which the ghost cannot disambiguate
+(sec "Direction labelling") -- that is information, not a clock. Push also reports orientation
+in **radians** against the 0.15 rad gate, matching the benchmark protocol's units exactly; the
+doc's older `ORI DEG` examples are flip's, whose 10 deg gate is stated in degrees.
 
 Bars are `value / threshold` with the threshold marked at 60% of the width, so over-threshold is
 visible rather than clipped. The numeral is always printed beside the bar because the fill stops
@@ -234,6 +241,11 @@ zero HUD pixels.
 
 ## 6. Adopting this in push / rotate
 
+Status for push (2026-09-08): item 2 is done -- `--env_spacing` and `--hide_ground` are wired
+into `eval_push_policy.py` (hide_ground defaults on when recording, `--show_ground` overrides);
+items 3-4 hold by construction (rows 1-2 shared, push's rows 3-4 report exactly the scored
+gates, marks drawn because position gates). Item 1 (renderer consolidation) remains open debt.
+
 1. Import `goal_overlay` instead of keeping a private copy of the renderer. Push currently owns
    the original; moving it to the shared module and importing it back is the change that stops
    the two drifting.
@@ -249,7 +261,7 @@ zero HUD pixels.
 
 ## 7. Known duplication
 
-As of 2026-08-31 the renderer exists in **three** places: `eval_push_policy.py` (the original),
+As of 2026-09-08 unchanged: the renderer exists in **three** places: `eval_push_policy.py` (the original),
 `eval_rotate_policy.py` (its own copy, lines ~522-800), and `goal_overlay.py` (the extraction).
 Flip is the only harness importing the shared module.
 
