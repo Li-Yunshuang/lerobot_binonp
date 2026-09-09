@@ -15,14 +15,13 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_dit_objdelta (EMA)` | dit | both | n=0,rot=F | push_objonly_delta | all | 276 | **9.1%** | 3.6% | 115.9 | 8.4 |
 
 
-## `e23_ema_fixed`  (8 results)
+## `e23_ema_fixed`  (7 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `push_dit_objabs_xattn (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **83.3%** | 72.8% | 25.0 | 6.7 |
 | `push_dit_objabs_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_objonly | all | 276 | **82.2%** | 72.5% | 24.3 | 6.9 |
 | `push_dit_objabs_nogoalvec (K=1)` | dit | points | n=0,rot=F | push_objonly | all | 276 | **80.8%** | 68.8% | 24.2 | 7.3 |
-| `push_dit_objabs_xattn_wam (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **80.1%** | 65.2% | 27.6 | 7.0 |
 | `push_dit_objabs (K=1)` | dit | both | n=0,rot=F | push_objonly | all | 276 | **79.3%** | 67.4% | 27.7 | 7.6 |
 | `push_act_objabs (K=1)` | unet | ? | n=0,rot=F | push_objonly | all | 276 | **63.0%** | 42.0% | 31.9 | 9.8 |
 | `push_act_xattn (K=1)` | unet | ? | n=0,rot=F | push_objonly | all | 276 | **63.0%** | 40.6% | 30.9 | 10.3 |
@@ -51,6 +50,48 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v2_xattn (K=1)` | dit | both | n=0,rot=F | push_v2obj | 1545 | 36 | **58.3%** | 63.3% | 25.3 | 9.6 |
 | `push_v2_base (K=1)` | dit | both | n=0,rot=F | push_v2obj | 1545 | 36 | **55.6%** | 54.6% | 52.0 | 11.2 |
 | `push_v2_act (K=1)` | unet | ? | n=0,rot=F | push_v2obj | 1545 | 36 | **47.2%** | 44.6% | 32.3 | 11.3 |
+
+
+## `x75a_s1234_ema_fixed`  (1 result)
+
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **89.8%** | 71.4% | 20.9 | 6.9 |
+
+
+## `x75a_s2345_ema_fixed`  (1 result)
+
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **89.8%** | 71.7% | 19.9 | 8.4 |
+
+
+## `x75a_s3456_ema_fixed`  (1 result)
+
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **84.3%** | 71.4% | 19.3 | 7.3 |
+
+
+## `x75b_s1234_ema_fixed`  (1 result)
+
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 73.1% | 18.5 | 7.1 |
+
+
+## `x75b_s2345_ema_fixed`  (1 result)
+
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 76.5% | 18.3 | 7.1 |
+
+
+## `x75b_s3456_ema_fixed`  (1 result)
+
+| model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
+|---|---|---|---|---|---|---|---|---|---|---|
+| `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 75.4% | 20.2 | 8.7 |
 
 
 ## Reading these numbers
