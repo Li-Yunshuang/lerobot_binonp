@@ -52,56 +52,62 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v2_act (K=1)` | unet | ? | n=0,rot=F | push_v2obj | 1545 | 36 | **47.2%** | 44.6% | 32.3 | 11.3 |
 
 
-## `x75a_s1234_ema_fixed`  (3 results)
+## `x75a_s1234_ema_fixed`  (4 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **89.8%** | 71.4% | 20.9 | 6.9 |
+| `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **83.3%** | 70.7% | 19.2 | 6.4 |
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **80.6%** | 64.1% | 23.5 | 7.0 |
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **80.6%** | 69.9% | 20.5 | 8.1 |
 
 
-## `x75a_s2345_ema_fixed`  (3 results)
+## `x75a_s2345_ema_fixed`  (4 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **89.8%** | 71.7% | 19.9 | 8.4 |
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **87.0%** | 69.2% | 22.7 | 7.7 |
+| `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **87.0%** | 67.0% | 21.5 | 7.3 |
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **83.3%** | 69.9% | 83.6 | 8.5 |
 
 
-## `x75a_s3456_ema_fixed`  (3 results)
+## `x75a_s3456_ema_fixed`  (4 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **84.3%** | 63.8% | 22.4 | 7.6 |
 | `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **84.3%** | 71.4% | 19.3 | 7.3 |
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **81.5%** | 69.2% | 19.7 | 9.3 |
+| `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **79.6%** | 66.3% | 19.6 | 7.0 |
 
 
-## `x75b_s1234_ema_fixed`  (3 results)
+## `x75b_s1234_ema_fixed`  (4 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
+| `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 64.0% | 19.1 | 8.6 |
 | `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 73.1% | 18.5 | 7.1 |
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 71.2% | 19.9 | 8.4 |
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **78.3%** | 64.8% | 24.1 | 8.5 |
 
 
-## `x75b_s2345_ema_fixed`  (3 results)
+## `x75b_s2345_ema_fixed`  (4 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 76.5% | 18.3 | 7.1 |
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 73.9% | 17.3 | 7.8 |
+| `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **83.3%** | 67.4% | 19.6 | 8.1 |
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **78.3%** | 66.3% | 23.2 | 7.4 |
 
 
-## `x75b_s3456_ema_fixed`  (3 results)
+## `x75b_s3456_ema_fixed`  (4 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `push_v3all_xattn (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 75.4% | 20.2 | 8.7 |
+| `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **85.0%** | 66.7% | 19.6 | 7.8 |
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **81.7%** | 69.3% | 22.2 | 6.4 |
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **78.3%** | 72.0% | 16.9 | 7.0 |
 
