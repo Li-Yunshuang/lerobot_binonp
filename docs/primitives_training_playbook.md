@@ -5,23 +5,23 @@ manipulation primitive (push today; rotate and flip next), written to be followe
 that has never seen this campaign. Everything here is the corrected-stack procedure as of
 2026-08-31; older documents that disagree carry a superseded banner pointing back here.
 
-**The standard configurations** (all action-head-only — no auxiliary prediction). The full 2×2
-over the two goal pathways, n=276 each, paired goals, corrected harness:
+**The standard configurations** (all action-head-only — no auxiliary prediction). Current
+benchmark: the v3 collection (1929 episodes, all trained on), frozen expert>75% list (45
+objects), 12 rollouts x 3 eval seeds = n=1620 per model, full success (pos AND ori) ± seed std:
 
-| config | goal cloud | goal vector | cross-attention | primary / strict |
-|---|---|---|---|---|
-| **reference: cross-attention** | ✓ | ✓ | ✓ | **83.3% / 72.8%** |
-| **cross-attention, no vector** | ✓ | — | ✓ | **82.2% / 72.5%** |
-| no cross-attention (baseline) | ✓ | ✓ | — | 79.3% / 67.4% |
-| neither | ✓ | — | — | 80.8% / 68.8% |
+| config | goal cloud | goal vector | cross-attention | 30mm/0.15rad | 50mm/0.20rad |
+|---|---|---|---|---|---|
+| **reference: cross-attention + vector** | ✓ | ✓ | ✓ | **73.2 ± 0.9** | **84.1 ± 1.0** |
+| cross-attention, no vector | ✓ | — | ✓ | 71.0 ± 0.7 | 81.6 ± 0.9 |
+| no cross-attention (baseline) | ✓ | ✓ | — | 66.2 ± 1.7 | 80.9 ± 1.9 |
+| neither | ✓ | — | — | 67.0 ± 0.5 | 80.3 ± 0.7 |
 
-Two effects, no interaction: **cross-attention is worth ~+5 pp at the strict gate in both columns**
-(+5.4 pp p=0.036 with the vector, +5.1 pp p=0.065 without); **the goal vector is worth ~0 in both
-rows** (−0.4 pp p=1.0 inside the full method). On push, the goal *cloud* carries the whole task.
-Caveat before generalising: push's commanded rotation is ~identity, so the vector's six rotation
-dims were near-constant here — on **rotate/flip they carry the task**, and the vector must be
-re-ablated there rather than dropped by inheritance. For push deployment, cross-attention without
-the vector is the simplest recipe at full strength.
+On v3: **cross-attention +7.0 pp strict** (+4.0 without the vector); **goal vector +2.2 pp with
+cross-attention and ~0 without it** (interaction +3.0) — the vector only pays once attention has
+related the two clouds, so the reference config is the recommended recipe. Earlier datasets
+disagreed on the vector (v1: ~0 everywhere), so treat the vector's value as data-dependent and
+conditional on cross-attention; the attention effect itself has replicated on every dataset
+generation. Rotate/flip still must re-ablate the vector — there its rotation dims carry the task.
 
 ---
 
@@ -147,9 +147,9 @@ RoPE DiT over 64 action tokens; ε-prediction, DDIM-10 at inference; 64-step chu
 Both are pure configurations -- no code beyond what the repo carries. Use the §2 common base
 command with `--policy.type`/flags below; evaluate identically to §3. Push results (n=276):
 
-**ACT** (Zhao et al. 2023; `pc_act` policy -- stock ACT head on our encoders): 63.0% / 42.0%.
-Cross-attention (`--policy.pc_cross_attention=true`) does nothing for it (63.0% / 40.6%) --
-the correspondence gain is diffusion-head-specific.
+**ACT** (Zhao et al. 2023; `pc_act` policy -- stock ACT head on our encoders): v3 benchmark
+57.9 / 74.8 full success (strict/loose), ~15 pp behind the reference at strict. On v1,
+cross-attention did nothing for it (the correspondence gain is diffusion-head-specific).
 
 ```bash
   --policy.type=pc_act            # chunk 64 / execute 32, MEAN_STD, lr 1e-4 are its defaults
