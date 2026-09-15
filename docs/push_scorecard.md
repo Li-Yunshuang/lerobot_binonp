@@ -52,7 +52,7 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v2_act (K=1)` | unet | ? | n=0,rot=F | push_v2obj | 1545 | 36 | **47.2%** | 44.6% | 32.3 | 11.3 |
 
 
-## `x75a_s1234_ema_fixed`  (6 results)
+## `x75a_s1234_ema_fixed`  (7 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -61,10 +61,11 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 108 | **80.6%** | 64.1% | 23.5 | 7.0 |
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **80.6%** | 69.9% | 20.5 | 8.1 |
 | `push_v3all_act (K=1)` | unet | ? | n=0,rot=F | push_v3obj | all | 108 | **73.1%** | 58.7% | 25.7 | 8.3 |
+| `push_v3all_dp3_267m (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 108 | **49.1%** | 38.8% | 256.2 | 11.9 |
 | `push_v3all_dp3 (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 108 | **47.2%** | 29.3% | 53.9 | 11.2 |
 
 
-## `x75a_s2345_ema_fixed`  (6 results)
+## `x75a_s2345_ema_fixed`  (7 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -73,10 +74,11 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **87.0%** | 67.0% | 21.5 | 7.3 |
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **83.3%** | 69.9% | 83.6 | 8.5 |
 | `push_v3all_act (K=1)` | unet | ? | n=0,rot=F | push_v3obj | all | 108 | **74.1%** | 60.9% | 26.6 | 8.5 |
+| `push_v3all_dp3_267m (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 108 | **54.6%** | 39.1% | 38.2 | 11.6 |
 | `push_v3all_dp3 (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 108 | **47.2%** | 26.8% | 54.3 | 12.3 |
 
 
-## `x75a_s3456_ema_fixed`  (6 results)
+## `x75a_s3456_ema_fixed`  (7 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -85,10 +87,11 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **81.5%** | 69.2% | 19.7 | 9.3 |
 | `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 108 | **79.6%** | 66.3% | 19.6 | 7.0 |
 | `push_v3all_act (K=1)` | unet | ? | n=0,rot=F | push_v3obj | all | 108 | **73.1%** | 55.1% | 28.7 | 8.7 |
+| `push_v3all_dp3_267m (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 108 | **58.3%** | 42.0% | 299.4 | 11.5 |
 | `push_v3all_dp3 (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 108 | **56.5%** | 27.9% | 102.7 | 13.4 |
 
 
-## `x75b_s1234_ema_fixed`  (6 results)
+## `x75b_s1234_ema_fixed`  (7 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -97,10 +100,11 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **86.7%** | 71.2% | 19.9 | 8.4 |
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **78.3%** | 64.8% | 24.1 | 8.5 |
 | `push_v3all_act (K=1)` | unet | ? | n=0,rot=F | push_v3obj | all | 60 | **73.3%** | 59.1% | 29.5 | 8.6 |
+| `push_v3all_dp3_267m (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 60 | **16.7%** | 9.1% | 88.4 | 17.2 |
 | `push_v3all_dp3 (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 60 | **10.0%** | 4.9% | 111.6 | 9.7 |
 
 
-## `x75b_s2345_ema_fixed`  (6 results)
+## `x75b_s2345_ema_fixed`  (7 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -109,10 +113,11 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v3all_neither (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **83.3%** | 67.4% | 19.6 | 8.1 |
 | `push_v3all_base (K=1)` | dit | both | n=0,rot=F | push_v3obj | all | 60 | **78.3%** | 66.3% | 23.2 | 7.4 |
 | `push_v3all_act (K=1)` | unet | ? | n=0,rot=F | push_v3obj | all | 60 | **63.3%** | 57.2% | 28.3 | 10.5 |
+| `push_v3all_dp3_267m (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 60 | **23.3%** | 10.6% | 83.7 | 18.2 |
 | `push_v3all_dp3 (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 60 | **16.7%** | 6.4% | 116.3 | 10.4 |
 
 
-## `x75b_s3456_ema_fixed`  (6 results)
+## `x75b_s3456_ema_fixed`  (7 results)
 
 | model | backbone | goal | aux | data | eps | n | **23obj @50mm** | strict 28obj | pos | ori |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -122,6 +127,7 @@ each axis would allow if the other were perfect — the lower one is what binds.
 | `push_v3all_xattn_novec (K=1)` | dit | points | n=0,rot=F | push_v3obj | all | 60 | **78.3%** | 72.0% | 16.9 | 7.0 |
 | `push_v3all_act (K=1)` | unet | ? | n=0,rot=F | push_v3obj | all | 60 | **73.3%** | 56.4% | 30.1 | 8.5 |
 | `push_v3all_dp3 (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 60 | **15.0%** | 3.8% | 116.8 | 12.1 |
+| `push_v3all_dp3_267m (K=1)` | unet | points | n=0,rot=F | push_v3obj | all | 60 | **11.7%** | 6.1% | 127.7 | 19.9 |
 
 
 ## Reading these numbers

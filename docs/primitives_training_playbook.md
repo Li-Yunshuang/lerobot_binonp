@@ -145,7 +145,7 @@ RoPE DiT over 64 action tokens; ε-prediction, DDIM-10 at inference; 64-step chu
 ## 2b. Benchmark baselines (other method families, same inputs and protocol)
 
 Both are pure configurations -- no code beyond what the repo carries. Use the §2 common base
-command with `--policy.type`/flags below; evaluate identically to §3. Push results (n=276):
+command with `--policy.type`/flags below; evaluate identically to §3. Push results (v3 benchmark, n=1,620 per model):
 
 **ACT** (Zhao et al. 2023; `pc_act` policy -- stock ACT head on our encoders): v3 benchmark
 57.9 / 74.8 full success (strict/loose), ~15 pp behind the reference at strict. On v1,
@@ -155,13 +155,18 @@ cross-attention did nothing for it (the correspondence gain is diffusion-head-sp
   --policy.type=pc_act            # chunk 64 / execute 32, MEAN_STD, lr 1e-4 are its defaults
 ```
 
-**DP3** (Ze et al. 2024, adapted): 51.8% / 25.0%. Faithful pieces: 64-d compact encoders, DP
-UNet1D, sample prediction, DDIM 100/10, To=2. Adaptations: goal cloud through a second 64-d
-encoder (the task is goal-conditioned; original DP3 has no goal input), H=8/Ta=6 instead of
-4/3 (our UNet needs horizon % 8 == 0), state concatenated raw, our standard budget.
+**DP3** (Ze et al. 2024, adapted): run at DP3's official U-Net widths `[512,1024,2048]` (267 M) --
+24.6 / 38.5 full success (strict/loose). An earlier variant with `[256,512,1024]` (73 M; those
+widths come from no DP3 source) scored 16.8 / 30.3 and is superseded. The paired size effect is
++7.8 pp strict (McNemar p=9e-12) and it is uneven: position success +14.7 pp, orientation -11.1 pp.
+Kept from DP3: PointNetMaxPool encoder, 64-d observation feature, DP UNet1D, sample prediction,
+DDIM 100/10, To=2. Adaptations: goal cloud through a second encoder (original DP3 has no goal
+input) at the default `goal_feature_dim=256`, not 64; H=8/Ta=6 (the paper's 4/3 cannot run on
+this U-Net; the released config's 16/8 could, and is untested); state concatenated raw; our
+standard budget (batch 64 x 100k steps; DP3 uses batch 128).
 
 ```bash
-  --policy.type=pc_diffusion --policy.backbone=unet --policy.down_dims='[256,512,1024]' \
+  --policy.type=pc_diffusion --policy.backbone=unet --policy.down_dims='[512,1024,2048]' \
   --policy.horizon=8 --policy.n_action_steps=6 \
   --policy.pc_feature_dim=64 --policy.prediction_type=sample \
   --policy.normalization_mapping='{"POINT_CLOUD":"IDENTITY","STATE":"MIN_MAX","ACTION":"MIN_MAX","VISUAL":"IDENTITY"}' \

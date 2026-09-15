@@ -48,6 +48,12 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_v3all_dp3` | x75b_s1234 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
 | `push_v3all_dp3` | x75b_s2345 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
 | `push_v3all_dp3` | x75b_s3456 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
+| `push_v3all_dp3_267m` | x75a_s1234 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
+| `push_v3all_dp3_267m` | x75a_s2345 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
+| `push_v3all_dp3_267m` | x75a_s3456 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
+| `push_v3all_dp3_267m` | x75b_s1234 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
+| `push_v3all_dp3_267m` | x75b_s2345 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
+| `push_v3all_dp3_267m` | x75b_s3456 | EMA, corrected harness | old | unet | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
 | `push_v3all_neither` | x75a_s1234 | EMA, corrected harness | old | dit | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
 | `push_v3all_neither` | x75a_s2345 | EMA, corrected harness | old | dit | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
 | `push_v3all_neither` | x75a_s3456 | EMA, corrected harness | old | dit | absolute | no | none | points | workspace | push_v3obj | all | 100000 |
@@ -115,15 +121,21 @@ settle fix; earlier rows had goal clouds floating up to ~9 cm and are precision-
 | `push_v2_base` | unseenv2 | EMA, corrected harness | 240 | **68.3%** | 62.2–73.9 | 54.6% | 57.5% | 86.7% | 72.9% | 79.6% | 52.0 / 16.6 / 413.1 / 57.3 | 11.2 / 5.3 / 18.3 / 29.0 |
 | `push_v2_act` | seenv2 | EMA, corrected harness | 276 | **65.9%** | 60.2–71.3 | 50.0% | 57.6% | 85.5% | 71.7% | 73.6% | 29.5 / 22.4 / 27.1 / 58.8 | 10.0 / 5.3 / 12.5 / 27.1 |
 | `push_v2_neither` | seenv2 | EMA, corrected harness | 276 | **65.2%** | 59.4–70.6 | 52.2% | 56.9% | 89.9% | 67.4% | 71.7% | 23.5 / 16.7 / 22.5 / 50.7 | 11.7 / 6.3 / 14.4 / 29.3 |
+| `push_v3all_dp3_267m` | x75a_s3456 | EMA, corrected harness | 276 | **63.8%** | 57.9–69.2 | 42.0% | 48.2% | 78.3% | 72.8% | 70.3% | 299.4 / 26.2 / 2490.4 / 90.4 | 11.5 / 7.3 / 18.6 / 26.2 |
 | `push_act_objabs` | e23 | EMA, corrected harness | 276 | **63.0%** | 57.2–68.5 | 42.0% | 49.6% | 80.4% | 71.7% | 78.6% | 31.9 / 24.9 / 27.4 / 67.1 | 9.8 / 7.4 / 10.0 / 22.0 |
 | `push_act_xattn` | e23 | EMA, corrected harness | 276 | **63.0%** | 57.2–68.5 | 40.6% | 49.6% | 83.0% | 69.6% | 76.8% | 30.9 / 23.2 / 24.3 / 68.1 | 10.3 / 7.1 / 10.4 / 26.5 |
 | `push_v2_act` | unseenv2 | EMA, corrected harness | 240 | **61.7%** | 55.4–67.6 | 44.6% | 49.6% | 81.2% | 66.2% | 79.6% | 32.3 / 24.3 / 30.0 / 72.2 | 11.3 / 7.8 / 15.4 / 27.1 |
+| `push_v3all_dp3_267m` | x75a_s2345 | EMA, corrected harness | 276 | **56.9%** | 51.0–62.6 | 39.1% | 46.7% | 75.4% | 64.1% | 65.2% | 38.2 / 25.1 / 37.4 / 84.0 | 11.6 / 7.5 / 13.4 / 26.4 |
+| `push_v3all_dp3_267m` | x75a_s1234 | EMA, corrected harness | 276 | **56.2%** | 50.3–61.9 | 38.8% | 46.7% | 77.5% | 65.9% | 64.1% | 256.2 / 27.1 / 2586.5 / 77.6 | 11.9 / 7.1 / 15.4 / 26.2 |
 | `push_v2_dp3` | unseenv2 | EMA, corrected harness | 240 | **53.3%** | 47.0–59.5 | 33.3% | 41.2% | 69.6% | 67.9% | 61.7% | 46.2 / 30.5 / 43.2 / 106.1 | 10.6 / 6.3 / 11.4 / 25.4 |
 | `push_dp3_objabs` | e23 | EMA, corrected harness | 276 | **51.8%** | 45.9–57.6 | 25.0% | 34.4% | 65.2% | 68.1% | 63.4% | 45.1 / 37.4 / 32.6 / 87.8 | 11.2 / 8.4 / 11.2 / 26.0 |
 | `push_v2_dp3` | seenv2 | EMA, corrected harness | 276 | **51.8%** | 45.9–57.6 | 31.5% | 39.9% | 70.7% | 62.7% | 56.5% | 43.5 / 32.2 / 37.9 / 97.5 | 12.2 / 7.7 / 11.9 / 29.7 |
 | `push_v3all_dp3` | x75a_s3456 | EMA, corrected harness | 276 | **49.6%** | 43.8–55.5 | 27.9% | 36.2% | 63.8% | 65.9% | 54.3% | 102.7 / 38.1 / 592.4 / 122.8 | 13.4 / 8.1 / 17.8 / 32.2 |
 | `push_v3all_dp3` | x75a_s1234 | EMA, corrected harness | 276 | **48.2%** | 42.4–54.1 | 29.3% | 35.5% | 62.0% | 64.9% | 51.8% | 53.9 / 39.5 / 44.9 / 124.5 | 11.2 / 7.5 / 12.5 / 23.5 |
 | `push_v3all_dp3` | x75a_s2345 | EMA, corrected harness | 276 | **47.1%** | 41.3–53.0 | 26.8% | 34.4% | 64.1% | 65.2% | 50.7% | 54.3 / 39.1 / 47.2 / 127.0 | 12.3 / 7.8 / 14.7 / 27.0 |
+| `push_v3all_dp3_267m` | x75b_s2345 | EMA, corrected harness | 264 | **19.7%** | 15.3–24.9 | 10.6% | 14.8% | 37.5% | 40.5% | 25.8% | 83.7 / 72.8 / 56.7 / 162.3 | 18.2 / 13.9 / 17.4 / 35.6 |
+| `push_v3all_dp3_267m` | x75b_s1234 | EMA, corrected harness | 264 | **15.9%** | 12.0–20.8 | 9.1% | 12.1% | 31.4% | 44.3% | 19.7% | 88.4 / 83.4 / 56.5 / 168.4 | 17.2 / 12.9 / 18.0 / 35.4 |
+| `push_v3all_dp3_267m` | x75b_s3456 | EMA, corrected harness | 264 | **15.5%** | 11.7–20.4 | 6.1% | 8.7% | 39.0% | 37.1% | 18.6% | 127.7 / 66.9 / 742.3 / 169.9 | 19.9 / 15.0 / 18.9 / 45.0 |
 | `push_v3all_dp3` | x75b_s2345 | EMA, corrected harness | 264 | **13.3%** | 9.7–17.9 | 6.4% | 8.0% | 18.6% | 66.7% | 16.3% | 116.3 / 126.9 / 60.3 / 190.9 | 10.4 / 6.1 / 11.6 / 28.7 |
 | `push_v3all_dp3` | x75b_s1234 | EMA, corrected harness | 264 | **11.4%** | 8.1–15.8 | 4.9% | 7.2% | 18.2% | 67.4% | 14.0% | 111.6 / 121.5 / 54.5 / 177.2 | 9.7 / 6.9 / 10.5 / 23.6 |
 | `push_v3all_dp3` | x75b_s3456 | EMA, corrected harness | 264 | **9.8%** | 6.8–14.0 | 3.8% | 6.8% | 16.3% | 62.1% | 11.7% | 116.8 / 124.0 / 54.9 / 191.2 | 12.1 / 8.0 / 12.7 / 29.3 |
