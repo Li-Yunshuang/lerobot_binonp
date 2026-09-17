@@ -171,15 +171,21 @@ Rows 1-2 are fixed across primitives; rows 3-4 carry the primitive's own success
 | 1 | `ON GOAL` / `PENDING` | same | same |
 | 2 | object name | same | same |
 | 3 | `POS MM` bar (30 mm gate) | `FACE` state | `POS MM` bar, if position gates |
-| 4 | `ORI RAD` bar (`0.04/0.15`) | `ORI DEG` bar (on-axis) | `ORI` bar (about the commanded axis) |
+| 4 | `ORI DEG` bar (`3.7/10.0`) | `ORI DEG` bar (on-axis) | `ORI` bar (about the commanded axis) |
 | 5 | -- (dropped) | `STEP <dir>` bar | `STEP <dir>` bar, direction label |
 
 Push dropped its STEP row (2026-09-07): a bare progress clock told the viewer nothing the video
 timeline does not, and every removed row is HUD off the scene. Flip and rotate keep row 5
 because theirs carries the **commanded direction**, which the ghost cannot disambiguate
-(sec "Direction labelling") -- that is information, not a clock. Push also reports orientation
-in **radians** against the 0.15 rad gate, matching the benchmark protocol's units exactly; the
-doc's older `ORI DEG` examples are flip's, whose 10 deg gate is stated in degrees.
+(sec "Direction labelling") -- that is information, not a clock.
+
+**Push's gate is configurable, and the HUD follows it** (2026-09-17). `SUCCESS_POS_MM` and
+`SUCCESS_ORI_DEG` override the defaults (30 mm / 0.15 rad, the frozen benchmark's strict gate);
+the single gate drives the recorded `success` flag, the ghost tint, the banner and both bars, so
+they cannot disagree. The orientation row reads **degrees** because that is the unit a viewer
+can judge, and the threshold is printed beside the value (`ORI DEG 3.7/10.0`) so the clip states
+which gate it was rendered under. Whenever the HUD gate differs from the gate the scorecard
+reports, say so with the clips -- a viewer cannot tell 8.6 deg from 10 deg by eye.
 
 Bars are `value / threshold` with the threshold marked at 60% of the width, so over-threshold is
 visible rather than clipped. The numeral is always printed beside the bar because the fill stops
